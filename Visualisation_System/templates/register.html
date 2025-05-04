@@ -1,0 +1,60 @@
+<!-- 注册界面 -->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>注册 - 可视化系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .required-star {
+            color: red;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>用户注册</h1>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul style="color: red;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label for="username">用户名：<span class="required-star">*</span></label>
+                <input type="text" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码：<span class="required-star">*</span></label>
+                <input type="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">用户类型：<span class="required-star">*</span></label>
+                <select name="role" required>
+                    <option value="1">养殖户</option>
+                    <option value="2" selected>普通用户</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">电话：</label>
+                <input type="text" name="phone"> <!-- 可为空 -->
+            </div>
+
+            <button type="submit">注册</button>
+        </form>
+
+        <p>已有账号？<a href="{{ url_for('login') }}">点击登录</a></p>
+    </div>
+</body>
+</html>
