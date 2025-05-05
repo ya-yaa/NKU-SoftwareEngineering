@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
@@ -46,6 +47,14 @@ def register():
             (username, hashed_pwd, role, phone)
         )
         conn.commit()
+
+        # 记录操作日志（注册）
+        cursor.execute(
+            "INSERT INTO action_logs (username,  role, action_type, timestamp) VALUES (%s, %s, %s, %s)",
+            (username, role, '注册', datetime.now())
+        )
+        conn.commit()
+
         conn.close()
 
         flash("注册成功，请登录。")
@@ -64,17 +73,27 @@ def login():
         cursor = conn.cursor()
         cursor.execute("SELECT id, password, role FROM users WHERE username = %s", (username,))
         user = cursor.fetchone()
-        conn.close()
 
         # 验证密码是否正确
         if user and check_password_hash(user[1], password):
             session['user_id'] = user[0]
             session['username'] = username
             session['role'] = user[2]
+
+            # 记录操作日志（登录）
+            cursor.execute(
+                "INSERT INTO action_logs (username,  role, action_type, timestamp) VALUES (%s, %s, %s, %s)",
+                (username, user[2], '登录', datetime.now())
+            )
+            conn.commit()
+
+            conn.close()
+
             flash("登录成功。")
             return redirect(url_for('home'))
         else:
             flash("用户名或密码错误。")
+            conn.close()
             return redirect(url_for('login'))
 
     return render_template('login.html')
@@ -92,6 +111,17 @@ def logout():
     session.clear()
     flash("您已退出登录。")
     return redirect(url_for('login'))
+
+# 管理员查看操作日志
+@app.route('/admin/logs')
+def admin_logs():
+    conn = pymysql.connect(**db_config)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, username,  role, action_type, timestamp FROM action_logs ORDER BY timestamp DESC")
+    logs = cursor.fetchall()
+    conn.close()
+    return render_template('admin_logs.html', logs=logs)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
