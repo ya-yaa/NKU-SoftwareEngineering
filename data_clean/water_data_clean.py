@@ -6,7 +6,7 @@ import csv
 def collect_fish_farms(root_dir):
     """遍历所有json文件，提取唯一渔场组合"""
     fish_farm_map = {}
-    fish_farm_id = 0
+    fish_farm_id = 1
 
     for foldername, subfolders, filenames in os.walk(root_dir):
         for filename in filenames:
@@ -31,7 +31,7 @@ def collect_fish_farms(root_dir):
                         if key not in fish_farm_map:
                             fish_farm_map[key] = {
                                 "渔场ID": fish_farm_id,
-                                "养殖户ID": random.randint(0, 9)
+                                "养殖户ID": random.randint(1, 10)
                             }
                             fish_farm_id += 1
     return fish_farm_map
