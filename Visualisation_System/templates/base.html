@@ -1,0 +1,115 @@
+<!-- 管理员用户管理基础模板界面 -->
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}管理系统{% endblock %}</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 40px auto;
+      max-width: 900px;
+      background-color: #f9f9f9;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    header, footer {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #eee;
+    }
+
+    input[type="text"], input[type="password"], input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    input[type="submit"], button {
+      padding: 6px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover, button:hover {
+      background-color: #0056b3;
+    }
+
+    a {
+      text-decoration: none;
+      color: #007bff;
+      margin-right: 10px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .form-section {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    ul {
+      color: red;
+      list-style: none;
+    }
+
+    .actions form {
+      display: inline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>用户管理系统</h1>
+    {% if session.username %}
+      <p>当前用户：{{ session.username }} | 角色：{{ session.role }} | <a href="{{ url_for('logout') }}">退出登录</a></p>
+    {% endif %}
+    <hr>
+  </header>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer>
+    <hr>
+    <p>&copy; 2025 用户管理系统</p>
+  </footer>
+</body>
+</html>

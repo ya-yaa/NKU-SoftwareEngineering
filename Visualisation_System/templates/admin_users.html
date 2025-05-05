@@ -1,0 +1,33 @@
+<!-- 管理员用户列表管理界面 -->
+
+{% extends "base.html" %}
+{% block title %}用户管理{% endblock %}
+{% block content %}
+<h2>用户管理</h2>
+<a href="{{ url_for('add_user') }}">➕ 添加新用户</a>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th><th>用户名</th><th>角色</th><th>电话</th><th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ u[0] }}</td>
+      <td>{{ u[1] }}</td>
+      <td>{{ u[2] }}</td>
+      <td>{{ u[3] }}</td>
+      <td>
+        <a href="{{ url_for('edit_user', user_id=u[0]) }}">✏️ 编辑</a>
+        <form action="{{ url_for('delete_user', user_id=u[0]) }}" method="post" style="display:inline">
+          <button type="submit" onclick="return confirm('确认删除该用户？')">🗑️ 删除</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="{{ url_for('home') }}">返回首页</a>
+{% endblock %}
+
