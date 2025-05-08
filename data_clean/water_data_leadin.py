@@ -6,7 +6,6 @@ import mysql.connector
 from datetime import datetime
 import numpy as np
 
-# 数据库连接
 conn = mysql.connector.connect(
     host='localhost',
     user='root',
@@ -14,26 +13,21 @@ conn = mysql.connector.connect(
     database='visualsystem',
     charset='utf8mb4'
 )
-
 cursor = conn.cursor()
 
-# 清理 HTML 标签
 def clean_html(value):
     if isinstance(value, str) and '<' in value:
         return BeautifulSoup(value, 'html.parser').text
     return value
 
-# 清理值
 def clean_value(val):
     if pd.isna(val) or val in ["", "--", "*", "null", None]:
         return None
     return val
 
-# 安全处理 DataFrame 的所有元素
 def clean_dataframe(df):
     return df.apply(lambda col: col.map(clean_html)).applymap(clean_value)
 
-# 解析单个 JSON 文件
 def parse_json_file(file_path, date_str):
     date_str = date_str.split('.')[0]
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -42,12 +36,9 @@ def parse_json_file(file_path, date_str):
     columns = [BeautifulSoup(col, 'html.parser').text.split('(')[0].strip() for col in data['thead']]
     df = pd.DataFrame(data['tbody'], columns=columns)
     df = clean_dataframe(df)
-
-    # 添加日期字段
     df['date'] = pd.to_datetime(date_str, format="%Y-%m-%d")
     return df
 
-# 读取所有 JSON 文件
 all_data = []
 root_path = "./水质数据（已清理）/water_data_clean"
 for month_dir in os.listdir(root_path):
@@ -62,7 +53,6 @@ for month_dir in os.listdir(root_path):
 
 df_all = pd.concat(all_data, ignore_index=True)
 
-# 插入数据
 for _, row in df_all.iterrows():
     print("将要插入：", row.to_dict())
     try:
