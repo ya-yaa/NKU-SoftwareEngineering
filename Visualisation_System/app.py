@@ -288,10 +288,11 @@ def warning():
     for farm in farms:
         cursor.execute("""
             SELECT * FROM water_quality_data 
-            WHERE farm_id = %s AND farmer_id = %s 
-            AND DATE_FORMAT(monitor_time, '%%m-%%d') = DATE_FORMAT(CURDATE(), '%%m-%%d')
-            ORDER BY monitor_time DESC LIMIT 1
-        """, (farm['farm_id'], user_id))
+            WHERE farm_id = %s  
+            AND DATE_FORMAT(monitor_time, '%%m-%%d %%H:%%i:%%s') <= DATE_FORMAT(NOW(), '%%m-%%d %%H:%%i:%%s')
+            ORDER BY DATE_FORMAT(monitor_time, '%%m-%%d %%H:%%i:%%s') DESC 
+            LIMIT 1
+        """, (farm['farm_id']))
         row = cursor.fetchone()
         if row:
             quality_level = row.get('quality_level', '未知')
