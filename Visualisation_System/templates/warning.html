@@ -63,6 +63,7 @@
             {% if farm.site_status == '正常' %}
                 <table>
                     <tr>
+                        <th>说明</th>
                         {% for key in farm["values"].keys() %}
                             <th>
                                 {# 中文表头映射 #}
@@ -83,11 +84,13 @@
                         {% endfor %}
                     </tr>
                     <tr>
+                        <td>监测数据</td>
                         {% for value in farm["values"].values() %}
                             <td class="{{ 'exceed' if value.exceed else '' }}">{{ value.data }}</td>
                         {% endfor %}
                     </tr>
                     <tr>
+                        <td>标准值</td>
                         {% for value in farm["values"].values() %}
                             <td>{{ value.standard }}</td>
                         {% endfor %}
