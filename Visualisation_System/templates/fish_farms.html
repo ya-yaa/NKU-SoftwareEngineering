@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>渔场信息</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .search-form {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>渔场信息一览</h1>
+
+    <form method="POST" class="search-form">
+        <input type="text" name="search" placeholder="请输入渔场名称..." value="{{ search_query }}">
+        <button type="submit">搜索</button>
+    </form>
+
+    {% if fish_farms %}
+    <table>
+        <thead>
+            <tr>
+                <th>渔场ID</th>
+                <th>养殖户ID</th>
+                <th>所在省份</th>
+                <th>流域</th>
+                <th>河段名称</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for farm in fish_farms %}
+            <tr>
+                <td>{{ farm[0] }}</td>
+                <td>{{ farm[1] }}</td>
+                <td>{{ farm[2] }}</td>
+                <td>{{ farm[3] }}</td>
+                <td>{{ farm[4] }}</td>
+                <td><a href="{{ url_for('view_fish_farm', farm_id=farm[0]) }}">查看详情</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% else %}
+        <p>未找到任何渔场。</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('home') }}">返回首页</a>
+</body>
+</html>
