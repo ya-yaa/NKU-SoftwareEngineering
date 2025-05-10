@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>系统首页</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .links a {
+            display: block;
+            margin: 10px 0;
+            font-size: 18px;
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>欢迎您，{{ username }}！</h1>
+    <p>角色：{{ role }}</p>
+
+    <div class="links">
+        <a href="{{ url_for('fish_farms') }}">查看渔场信息</a>
+        <a href="{{ url_for('admin_users') }}">用户管理</a>
+        <a href="{{ url_for('admin_logs') }}">查看操作日志</a>
+        
+    </div>
+
+    <br>
+    <a href="{{ url_for('logout') }}">退出登录</a>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>渔场详情</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f8fb;
+            color: #333;
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        a {
+            display: inline-block;
+            margin: 15px 0;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #2980b9;
+        }
+
+        .weather-info, .video-section {
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .weather-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .weather-info li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .weather-info li:last-child {
+            border-bottom: none;
+        }
+
+        .video-section video {
+            display: block;
+            max-width: 100%;
+            margin-top: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>渔场详情</h1>
+    <p><strong>渔场ID:</strong> {{ farm[0] }}</p>
+    <p><strong>渔场主ID:</strong> {{ farm[1] }}</p>
+    <p><strong>省份:</strong> {{ farm[2] }}</p>
+    <p><strong>所属流域:</strong> {{ farm[3] }}</p>
+    <a href="{{ url_for('fish_farms') }}">返回渔场列表</a>
+
+    <div class="weather-info">
+        <h2>当前天气</h2>
+        <ul>
+            <li><strong>当前温度：</strong>{{ current_temp }} ℃</li>
+            <li><strong>当前降雨量：</strong>{{ current_rain }} mm</li>
+            <li><strong>今日最高气温：</strong>{{ today_temp_max }} ℃</li>
+            <li><strong>今日最低气温：</strong>{{ today_temp_min }} ℃</li>
+        </ul>
+    </div>
+
+    <div class="video-section">
+        <h2>渔场视频展示</h2>
+        {% if video_url %}
+            <video controls>
+                <source src="{{ video_url }}" type="video/mp4">
+                您的浏览器不支持 HTML5 视频播放。
+            </video>
+        {% else %}
+            <p>暂无视频资源</p>
+        {% endif %}
+    </div>
+</body>
+</html>
