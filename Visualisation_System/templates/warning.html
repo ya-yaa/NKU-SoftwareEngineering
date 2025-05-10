@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>渔场水质监测</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .farm-info {
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .status-warn {
+            color: red;
+            font-weight: bold;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .exceed {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>您的渔场今日水质监测数据</h1>
+
+    {% if data %}
+        {% for farm in data %}
+            <div class="farm-info">
+                <div>
+                    <strong>省份：</strong>{{ farm.province }}，
+                    <strong>流域：</strong>{{ farm.river_basin }}，
+                    <strong>断面：</strong>{{ farm.section_name }}
+                </div>
+                <div>
+                    <strong>水质等级：</strong>{{ farm.quality_level }}，
+                    <strong>监测时间：</strong>{{ farm.monitor_time }}，
+                    <strong>站点状态：</strong>
+                    <span class="{{ 'status-warn' if farm.site_status != '正常' else '' }}">
+                        {{ farm.site_status }}
+                    </span>
+                </div>
+            </div>
+
+            {% if farm.site_status == '正常' %}
+                <table>
+                    <tr>
+                        <th>说明</th>
+                        {% for key in farm["values"].keys() %}
+                            <th>
+                                {# 中文表头映射 #}
+                                {% if key == 'water_temp' %}水温 (℃)
+                                {% elif key == 'ph' %}pH
+                                {% elif key == 'dissolved_oxygen' %}溶解氧 (mg/L)
+                                {% elif key == 'conductivity' %}电导率 (μS/cm)
+                                {% elif key == 'turbidity' %}浊度 (NTU)
+                                {% elif key == 'cod_mn' %}高锰酸盐指数 (mg/L)
+                                {% elif key == 'ammonia_nitrogen' %}氨氮 (mg/L)
+                                {% elif key == 'total_phosphorus' %}总磷 (mg/L)
+                                {% elif key == 'total_nitrogen' %}总氮 (mg/L)
+                                {% elif key == 'chlorophyll_a' %}叶绿素α (mg/L)
+                                {% elif key == 'algae_density' %}藻密度 (cells/L)
+                                {% else %}{{ key }}
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>监测数据</td>
+                        {% for value in farm["values"].values() %}
+                            <td class="{{ 'exceed' if value.exceed else '' }}">{{ value.data }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>标准值</td>
+                        {% for value in farm["values"].values() %}
+                            <td>{{ value.standard }}</td>
+                        {% endfor %}
+                    </tr>
+                </table>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>今日暂无水质监测数据。</p>
+    {% endif %}
+
+    <a href="{{ url_for('home') }}">返回首页</a>
+</body>
+</html>
