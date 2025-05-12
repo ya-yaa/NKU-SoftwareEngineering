@@ -429,6 +429,28 @@ def datas():
     return render_template('datas.html', data=data)
 
 
+# 智能中心
+@app.route('/AI_center')
+def AI_center():
+    if 'username' not in session:
+        flash("请先登录。")
+        return redirect(url_for('login'))
+    return render_template('AI_center.html')
+
+# 图片识别
+@app.route('/AI_center/image_recognition')
+def image_recognition():
+    return "<h2>图片识别模块（待实现）</h2>"
+
+# 鱼类体长预测
+@app.route('/AI_center/fish_length_prediction')
+def fish_length_prediction():
+    return "<h2>鱼类体长预测模块（待实现）</h2>"
+
+# 智能问答
+@app.route('/AI_center/ai_qa')
+def ai_qa():
+    return "<h2>智能问答模块（待实现）</h2>"
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>系统首页</title>
+    <title>智能中心</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,15 +21,11 @@
     </style>
 </head>
 <body>
-    <h1>欢迎您，{{ username }}！</h1>
-    <p>角色：{{ role }}</p>
 
     <div class="links">
-        <a href="{{ url_for('fish_farms') }}">查看渔场信息</a>
-        <a href="{{ url_for('admin_users') }}">用户管理</a>
-        <a href="{{ url_for('admin_logs') }}">查看操作日志</a>
-        <a href="{{ url_for('datas') }}">数据中心</a>
-        <a href="{{ url_for('AI_center') }}">智能中心</a> 
+        <a href="{{ url_for('image_recognition') }}">图片识别</a>
+        <a href="{{ url_for('fish_length_prediction') }}">鱼类体长预测</a>
+        <a href="{{ url_for('ai_qa') }}">智能问答</a>
     </div>
 
     <br>
