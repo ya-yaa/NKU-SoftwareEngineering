@@ -11,7 +11,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '123456',
+    'password': 'Root12345!',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -91,7 +91,7 @@ def login():
             conn.close()
 
             flash("登录成功。")
-            return redirect(url_for('warning'))
+            return redirect(url_for('home'))
         else:
             flash("用户名或密码错误。")
             conn.close()
@@ -328,11 +328,11 @@ def get_coordinates(province):
 
 
 
-# 警报功能
+# 数据中心（由警报改）
 from datetime import date
 
-@app.route('/warning')
-def warning():
+@app.route('/datas')
+def datas():
     if 'user_id' not in session or session.get('role') != 1:
         flash("请先登录养殖户账号。")
         return redirect(url_for('login'))
@@ -426,7 +426,7 @@ def warning():
             data.append(farm_display)
 
     conn.close()
-    return render_template('warning.html', data=data)
+    return render_template('datas.html', data=data)
 
 
 
