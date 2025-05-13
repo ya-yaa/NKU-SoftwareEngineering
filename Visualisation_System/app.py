@@ -11,7 +11,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Root12345!',
+    'password': '040702',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -116,9 +116,9 @@ def logout():
 # 管理员查看操作日志
 @app.route('/admin/logs')
 def admin_logs():
-    # if session.get('role') != 0:  
-    #     flash("您无权访问此页面。")
-    #     return redirect(url_for('home'))
+    if session.get('role') != 0:  
+        flash("您无权访问此页面。")
+        return redirect(url_for('home'))
 
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()
@@ -130,9 +130,9 @@ def admin_logs():
 # 管理员查看所有用户
 @app.route('/admin/users')
 def admin_users():
-    # if session.get('role') != 0:  
-    #     flash("您无权访问此页面。")
-    #     return redirect(url_for('home'))
+    if session.get('role') != 0:  
+        flash("您无权访问此页面。")
+        return redirect(url_for('home'))
 
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()
@@ -145,9 +145,9 @@ def admin_users():
 # 修改用户信息
 @app.route('/admin/users/edit/<int:user_id>', methods=['GET', 'POST'])
 def edit_user(user_id):
-    # if session.get('role') != 0:
-    #     flash("无权限")
-    #     return redirect(url_for('home'))
+    if session.get('role') != 0:
+        flash("无权限")
+        return redirect(url_for('home'))
 
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()
@@ -180,9 +180,9 @@ def edit_user(user_id):
 # 删除用户
 @app.route('/admin/users/delete/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
-    # if session.get('role') != 0:
-    #     flash("无权限")
-    #     return redirect(url_for('home'))
+    if session.get('role') != 0:
+        flash("无权限")
+        return redirect(url_for('home'))
 
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()
@@ -196,9 +196,9 @@ def delete_user(user_id):
 # 添加用户
 @app.route('/admin/users/add', methods=['GET', 'POST'])
 def add_user():
-    # if session.get('role') != 0:
-    #     flash("无权限")
-    #     return redirect(url_for('home'))
+    if session.get('role') != 0:
+        flash("无权限")
+        return redirect(url_for('home'))
 
     if request.method == 'POST':
         username = request.form['username']
