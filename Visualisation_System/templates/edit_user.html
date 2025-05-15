@@ -3,17 +3,63 @@
 {% extends "base.html" %}
 {% block title %}编辑用户{% endblock %}
 {% block content %}
+<style>
+.form-container {
+    background-color: rgba(255, 255, 255, 0.92);
+    padding: 30px;
+    margin: 20px auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+.logout-button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    min-width: 120px;
+    text-align: center;
+}
+
+.logout-button:hover {
+    opacity: 0.9;
+}
+</style>
+
 <h2>编辑用户信息</h2>
-<form method="post">
-  <label>用户名: <input type="text" name="username" value="{{ user[1] }}" required></label><br><br>
-  <label>密码（留空不修改）: <input type="password" name="password"></label><br><br>
-  <label>电话: <input type="text" name="phone" value="{{ user[3] }}"></label><br><br>
-  <label>角色（0=管理员，1=养殖户，2=普通用户）: <input type="number" name="role" value="{{ user[2] }}" required></label><br><br>
-  <!-- 按钮并排放置 -->
-  <div style="display: flex; gap: 10px;">
-    <input type="submit" value="保存修改" class="logout-button" style="background-color: #007bff;">
-    <a href="{{ url_for('admin_users') }}" class="logout-button" style="background-color: gray; display: inline-block; text-align: center; text-decoration: none;">返回用户管理</a>
-  </div>
-</form>
+<div class="form-container">
+  <form method="post">
+    <label>用户名: <input type="text" name="username" value="{{ user[1] }}" required></label><br><br>
+    <label>密码（留空不修改）: <input type="password" name="password"></label><br><br>
+    <label>电话: <input type="text" name="phone" value="{{ user[3] }}"></label><br><br>
+    <label>角色（0=管理员，1=养殖户，2=普通用户）: <input type="number" name="role" value="{{ user[2] }}" required></label><br><br>
+    
+    <div style="display: flex; gap: 10px;">
+      <input type="submit" value="保存修改" class="logout-button" style="background-color: #007bff;">
+      <a href="{{ url_for('admin_users') }}" class="logout-button" style="background-color: gray; display: inline-block; text-align: center; text-decoration: none;">返回用户管理</a>
+    </div>
+  </form>
+</div>
 
 {% endblock %}
