@@ -96,9 +96,6 @@
             padding: 10px;
             text-align: center;
         }
-        th {
-            /* background-color: #f2f2f2; */
-        }
         .exceed {
             color: red;
             font-weight: bold;
@@ -136,17 +133,17 @@
             {% for farm in data %}
                 <details>
                     <summary>
-                        {{ farm.section_name }} - {{ farm.quality_level }}（{{ farm.monitor_time }}）
+                        {{ farm.section_name }} - {{ farm.quality_level }}({{ farm.monitor_time }})
                     </summary>
                     <div class="farm-info">
                         <div>
-                            <strong>省份：</strong>{{ farm.province }}，
-                            <strong>流域：</strong>{{ farm.river_basin }}，
+                            <strong>省份：</strong>{{ farm.province }},
+                            <strong>流域：</strong>{{ farm.river_basin }},
                             <strong>断面：</strong>{{ farm.section_name }}
                         </div>
                         <div>
-                            <strong>水质等级：</strong>{{ farm.quality_level }}，
-                            <strong>监测时间：</strong>{{ farm.monitor_time }}，
+                            <strong>水质等级：</strong>{{ farm.quality_level }},
+                            <strong>监测时间：</strong>{{ farm.monitor_time }},
                             <strong>站点状态：</strong>
                             <span class="{% if farm.site_status == '正常' %}status-ok{% else %}status-warn{% endif %}">
                                 {{ farm.site_status }}
