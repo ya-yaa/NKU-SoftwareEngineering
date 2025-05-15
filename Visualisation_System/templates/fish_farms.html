@@ -37,6 +37,9 @@
         <button type="submit">搜索</button>
     </form>
 
+    <br>
+    <a href="{{ url_for('home') }}">返回首页</a>
+
     {% if fish_farms %}
     <table>
         <thead>
@@ -67,7 +70,6 @@
         <p>未找到任何渔场。</p>
     {% endif %}
 
-    <br>
-    <a href="{{ url_for('home') }}">返回首页</a>
+    
 </body>
 </html>
