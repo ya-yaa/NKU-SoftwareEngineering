@@ -22,7 +22,17 @@
 </head>
 <body>
     <h1>欢迎您，{{ username }}！</h1>
-    <p>角色：{{ role }}</p>
+    <p>角色：
+        {% if role == 0 %}
+            管理员
+        {% elif role == 1 %}
+            养殖户
+        {% elif role == 2 %}
+            普通用户
+        {% else %}
+            未知角色
+        {% endif %}
+    </p>
 
     <div class="links">
         <a href="{{ url_for('fish_farms') }}">查看渔场信息</a>
