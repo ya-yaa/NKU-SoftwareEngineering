@@ -7,9 +7,96 @@
     <title>登录 - 可视化系统</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            /* 设置背景图片为 logo.png */
+            background-image: url("{{ url_for('static', filename='images/logo.png') }}");
+            background-size: cover; /* 完全覆盖整个页面 */
+            background-position: center; /* 居中对齐 */
+            background-repeat: no-repeat; /* 不重复 */
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 防止背景图片被子元素继承透明度影响 */
+            background-attachment: fixed; /* 可选：背景固定不滚动 */
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9); /* 半透明白色背景增强可读性 */
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+            z-index: 1; /* 确保内容在背景之上 */
+            position: relative;
+        }
+
+        .container img {
+            width: 120px;
+            margin-bottom: 20px;
+            /* 如果你还想保留顶部的小 Logo 图标 */
+        }
+
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
         .required-star {
             color: red;
             margin-left: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4c82af;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4c82af;
+        }
+
+        p {
+            margin-top: 15px;
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul {
+            padding-left: 20px;
+            color: red;
+            text-align: left;
         }
     </style>
 </head>
@@ -19,7 +106,7 @@
 
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <ul style="color: red;">
+                <ul>
                     {% for message in messages %}
                         <li>{{ message }}</li>
                     {% endfor %}
@@ -30,12 +117,12 @@
         <form method="POST" action="{{ url_for('login') }}">
             <div class="form-group">
                 <label for="username">用户名：<span class="required-star">*</span></label>
-                <input type="text" name="username" required>
+                <input type="text" name="username" id="username" required>
             </div>
 
             <div class="form-group">
                 <label for="password">密码：<span class="required-star">*</span></label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" id="password" required>
             </div>
 
             <button type="submit">登录</button>
