@@ -11,7 +11,7 @@
             height: 100%;
             margin: 0;
             /* 设置背景图片为 logo.png */
-            background-image: url("{{ url_for('static', filename='images/logo.png') }}");
+            background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
             background-size: cover; /* 完全覆盖整个页面 */
             background-position: center; /* 居中对齐 */
             background-repeat: no-repeat; /* 不重复 */
@@ -101,6 +101,9 @@
     </style>
 </head>
 <body>
+    <header class="page-header">
+        <h1>智慧海洋牧场可视化系统</h1>
+    </header>
     <div class="container">
         <h1>用户登录</h1>
 
