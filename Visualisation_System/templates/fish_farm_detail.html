@@ -75,7 +75,8 @@
     <p><strong>省份:</strong> {{ farm[2] }}</p>
     <p><strong>所属流域:</strong> {{ farm[3] }}</p>
     <a href="{{ url_for('fish_farms') }}">返回渔场列表</a>
-
+    <a href="{{ url_for('v_fish_farm', farm_id=farm[0]) }}">查看水质、鱼类信息</a>
+    
     <div class="weather-info">
         <h2>当前天气</h2>
         <ul>

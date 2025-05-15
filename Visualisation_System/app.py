@@ -3,7 +3,8 @@ import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import requests
-
+import csv
+import os
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
 
@@ -285,6 +286,79 @@ def view_fish_farm(farm_id):
         video_url=video_url
     )
 
+def csv_to_json_array(csv_file_path):
+    # 读取CSV文件并转换为JSON数组
+    with open(csv_file_path, 'r', encoding='utf-8') as file:
+        reader = csv.DictReader(file)  # 自动读取CSV表头作为字典键
+        json_array = []
+        for row in reader:
+            # 处理每行数据，转换数值类型（可选）
+            processed_row = {
+                "Species": row["Species"],
+                "Weight(g)": float(row["Weight(g)"]),
+                "Length1(cm)": float(row["Length1(cm)"]),
+                "Length2(cm)": float(row["Length2(cm)"]),
+                "Length3(cm)": float(row["Length3(cm)"]),
+                "Height(cm)": float(row["Height(cm)"]),
+                "Width(cm)": float(row["Width(cm)"])
+            }
+            json_array.append(processed_row)
+        return json_array
+
+    
+
+@app.route('/fish_farm_detail/<int:farm_id>')
+def v_fish_farm(farm_id):
+    conn = pymysql.connect(**db_config)
+    cursor = conn.cursor()
+
+    # 获取渔场信息
+    # csv_path = "Fish.csv"  # CSV文件路径
+
+    # 获取当前文件（app.py）所在目录的绝对路径
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    # 拼接得到 CSV 文件的完整路径
+    csv_path = os.path.join(base_dir, "Fish.csv")
+
+    fish_data = csv_to_json_array(csv_path)
+    # 修正后的 SQL 查询，添加 source_a 条件
+    cursor.execute("SELECT * FROM water_quality_data WHERE farm_id = %s AND source_date = %s", (farm_id, '2020-05-08'))
+    wat = cursor.fetchone()
+    conn.close()
+    
+
+    if not wat:
+        return "未找到对应水质数据", 404
+
+    # 将罗马数字转换为阿拉伯数字
+    arabic_quality_level = roman_to_int(wat[5]) if wat[5] else 0
+
+    return render_template(
+        'wat.html',
+        wat=wat,
+        quality_level=arabic_quality_level,
+        water_temp=wat[6],
+        ph=wat[7],
+        dissolved_oxygen=wat[8],
+        turbidity=wat[10],
+        cod_mn=wat[11],
+        fishData=fish_data
+    )
+
+def roman_to_int(roman):
+    roman_map = {'I': 1, 'V': 5, 'Ⅲ': 3, 'Ⅱ': 2}
+    total = 0
+    prev_value = 0
+    
+    for char in reversed(roman):
+        value = roman_map.get(char, 0)
+        if value >= prev_value:
+            total += value
+        else:
+            total -= value
+        prev_value = value
+    
+    return total
 
 
 def get_coordinates(province):

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>水质数据展示</title>
+    <style>
+    body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #4b4848;
+        }
+        .data-container {
+            width:1000px;
+            float: left;
+            margin-left: 10px;
+        }
+        #chart {
+            position: absolute;
+            right: 100px;
+            top: 0px;
+            width: 550px;
+            height: 550px;
+            float: right;
+        }
+        .data-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .data-name {
+            width: 200px;
+            margin-right: 20px;
+        }
+
+        .progress-bar-container {
+            background-color: #aaa7a7;
+            height: 20px;
+            
+            border-radius: 5px;
+            overflow: hidden;
+            width: 500px;
+            margin-right: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #6699ff;
+            transition: width 0.3s ease;
+        }
+
+        .data-value {
+            min-width: 50px;
+            text-align: right;
+        }
+        #chart1 {
+            width: 1600px;
+            height: 400px;
+            position: fixed;
+            top: 500px;
+            left: 20px;
+            border-radius: 10px;
+        }
+        .legend {
+            position: absolute;
+            right: 800px;
+            bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .legend div {
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .info-box {
+            display: none;
+            position: absolute;
+            right: 20px;
+            bottom: 100px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        select {
+            padding: 5px;
+            margin-bottom: 10px;
+            
+        }
+        h2.title-left {
+            position: fixed;
+            left: 10px;
+            top: 380px;
+            margin: 0;
+            padding: 10px;
+            font-size: 30px;
+            border-radius: 10px;
+        }
+        .selection-container {
+            position: fixed;
+            left: 20px;
+            top: 450px;
+            gap: 20px;  /* 选择框之间的间距 */
+            margin-bottom: 20px;
+            background-color:#f4f4f9;
+        }
+        .white-box {
+            position: fixed; /* 固定位置 */
+            left: 20px; /* 距离左侧的距离 */
+            top: 440px; /* 距离顶部的距离 */
+            width: 70px; /* 方框的宽度 */
+            height: 20px; /* 方框的高度 */
+            background-color: #f4f4f9; /* 方框的背景颜色 */
+            border: 1px solid #f4f4f9; /* 方框的边框 */
+            padding: 10px; /* 内边距 */
+           /* 添加阴影效果 */
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="data-container">
+    <h1>水质数据展示</h1>
+    <div class="data-container">
+        <!-- 模拟数据展示项，实际应用中需从后端获取数据并动态更新 -->
+       <div class="data-item">
+        <span class="data-name">水质水平</span>
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: {{ quality_level*20}}%;"></div>
+        </div>
+        <span class="data-value">{{ quality_level }}</span>
+    </div>
+        <div class="data-item">
+            <span class="data-name">高锰酸盐浓度（‰）</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: {{ cod_mn*10}}%;"></div>
+            </div>
+            <span class="data-value">{{cod_mn}}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-name">溶解氧（mg/L）</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: {{ dissolved_oxygen*10}}%"></div>
+            </div>
+            <span class="data-value">{{dissolved_oxygen}}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-name">浊度（NTU）</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: {{ turbidity}}%;"></div>
+            </div>
+            <span class="data-value">{{turbidity}}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-name">pH</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: {{ph*10}}%;"></div>
+            </div>
+            <span class="data-value">{{ph}}</span>
+        </div>
+        <div class="data-item">
+            <span class="data-name">水温（℃）</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: {{ water_temp/30*100}}%;"></div>
+            </div>
+            <span class="data-value">{{water_temp}}</span>
+        </div>
+    </div>
+    </div>
+    <h2 style="text-align: left;font-size: 30px;">鱼群种类统计</h2>
+    <div id="chart"></div>
+    <script>
+        var chartDom = document.getElementById('chart');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        option = {
+            title: {
+               
+                left: 'center',
+                top: '10%',
+                textStyle: {
+                    color: '#ff0000'
+                }
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                orient: 'vertical',
+                right: '85%',
+                top: 'middle',
+                data: ['Bream', 'Roach', 'Whitefish', 'Parkki','Perch','Pike','Smelt']
+            },
+            series: [
+                {
+                    name: '鱼群种类',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '20',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        { value: 22.0, name: 'Bream' ,itemStyle: { color: '#A8E6CE' }},
+                        { value: 12.6, name: 'Roach' ,itemStyle: { color: '#CFFAFE' }},
+                        { value: 3.8, name: 'Whitefish' ,itemStyle: { color: '#95A8C5' }},
+                        { value: 6.9, name: 'Parkki' ,itemStyle: { color: '#FAFAD2' }},
+                        { value: 35.2, name: 'Perch' ,itemStyle: { color: '#EBEEBF' }},
+                        { value: 10.7, name: 'Pike' ,itemStyle: { color: '#95A3C6' }},
+                        { value: 8.2, name: 'Smelt' ,itemStyle: { color: '#5470C6' }}
+                    ]
+                }
+            ]
+        };
+
+        option && myChart.setOption(option);
+    </script>
+    
+    <div id="chart1"></div>
+    <h2 class="title-left">鱼群重量，尺寸等信息统计</h2>
+    <div class="selection-container">
+   
+    <select id="fishSpecies">
+        <option value="Bream">Bream</option>
+        <option value="Roach">Roach</option>
+        <option value="Whitefish">Whitefish</option>
+        <option value="Parkki">Parkki</option>
+        <option value="Perch">Perch</option>
+        <option value="Pike">Pike</option>
+        <option value="Smelt">Smelt</option>
+    </select>
+
+    <label for="viewObject">选择查看信息种类：</label>
+    <select id="viewObject" style="color: black; background-color: #f4f4f9; border: 1px solid #ccc;">
+        <option value="Weight(g)">重量 (g)</option>
+        <option value="Length1(cm)">长度1 (cm)</option>
+        <option value="Length2(cm)">长度2 (cm)</option>
+        <option value="Length3(cm)">长度3 (cm)</option>
+        <option value="Height(cm)">高度 (cm)</option>
+        <option value="Width(cm)">宽度 (cm)</option>
+    </select>
+    </div>
+    <div id="chart1">
+        <canvas id="fishChart"></canvas>
+    </div>
+
+    <script>
+        // 假设数据格式为数组，每个元素是一个包含鱼属性的对象
+        
+
+        const speciesSelect = document.getElementById('fishSpecies');
+        const objectSelect = document.getElementById('viewObject');
+        const chartCanvas = document.getElementById('fishChart');
+        const ctx = chartCanvas.getContext('2d');
+        let currentChart = null;  // 全局变量保存当前图表实例
+        function updateChart() {
+            if (currentChart) {
+        currentChart.destroy();
+    }
+            const selectedSpecies = speciesSelect.value;
+            const selectedObject = objectSelect.value;
+
+            let filteredData = {{ fishData|tojson|safe }};
+            
+
+            const labels = filteredData.map(fish => fish.Species);
+            const values = filteredData.map(fish => fish[selectedObject]);
+
+            console.log('选中种类:', selectedSpecies);
+            console.log('选中参数:', selectedObject);
+            console.log('处理后标签:', labels);
+            console.log('处理后数值:', values);
+
+            currentChart =new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: selectedObject,
+                        data: values,
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '种类'
+                        },
+                        grid: {
+                            display: true
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: selectedObject,
+                            fontSize:20
+
+                        },
+                        grid: {
+                            display: true
+                        },
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+        speciesSelect.addEventListener('change', updateChart);
+        objectSelect.addEventListener('change', updateChart);
+
+        // 初始加载时绘制图表
+        updateChart();
+    </script>
+    <div class="white-box">
+        
+    </div>
+</body>
+
+</html>
