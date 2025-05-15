@@ -2,6 +2,15 @@
 
 <!DOCTYPE html>
 <html lang="zh">
+<style>
+body {
+    background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+</style>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,19 +21,22 @@
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            /* display: flex; */
+            /* justify-content: center;
+            align-items: center; */
             height: 100vh;
         }
 
         .container {
+            margin: 40px auto; /* 水平自动居中 */
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
+            width: 60%;
             max-width: 1200px;
+            background-color: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
         }
 
         h1 {
@@ -47,8 +59,8 @@
         }
 
         th {
-            background-color: #f2f2f2;
-            color: #333;
+            background-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
         }
 
         tr:hover {
@@ -64,6 +76,9 @@
             text-decoration: none;
             display: inline-block;
             margin-top: 20px;
+        }
+        .btn-wrapper {
+            text-align: center;
         }
 
         .btn:hover {
@@ -99,7 +114,9 @@
             </tbody>
         </table>
 
-        <a href="{{ url_for('home') }}" class="btn">返回首页</a>
+        <div class="btn-wrapper">
+            <a href="{{ url_for('home') }}" class="btn">返回首页</a>
+        </div>
     </div>
 
 </body>
