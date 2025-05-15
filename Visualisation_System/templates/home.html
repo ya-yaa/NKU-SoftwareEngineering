@@ -15,25 +15,28 @@ body {
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>欢迎您，{{ username }}！</h1>
-    <p>角色：
-        {% if role == 0 %}
-            管理员
-        {% elif role == 1 %}
-            养殖户
-        {% elif role == 2 %}
-            普通用户
-        {% else %}
-            未知角色
-        {% endif %}
-    </p>
     <header class="page-header">
         <h1>智慧海洋牧场可视化系统</h1>
+        <div class="user-info">
+            <span>欢迎您，{{ username }}！</span>
+            <span>角色：
+                {% if role == 0 %}
+                    管理员
+                {% elif role == 1 %}
+                    养殖户
+                {% elif role == 2 %}
+                    普通用户
+                {% else %}
+                    未知角色
+                {% endif %}
+            </span>
+        </div>
     </header>   
+    
 
     <section class="intro-banner">
         <div class="intro-content">
-            <img src="{{ url_for('static', filename='images/image6.jpg') }}" alt="系统图片">
+            <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="系统图片">
             <div class="intro-text">
                 <h2>系统简介</h2>
                 <p>中国在全球渔业养殖中具有重要地位。然而，目前我国水产养殖系统存在一系列问题。国外采用 现代水质传感器技术和在线监控系统来全面监控养殖环境，并通过自动化养殖设备实现环境控制，提高效率，对环境起到积极作用。为了应对这些问题，中国在十四五发展计划中计划构建“物联网 +海洋牧场”，通过物联网、大数据、云计算等现代信息技术，建立全面、实时、智能的养殖监控系统，精确控制养殖环境，提高效率，减少病害的发生。</p>
@@ -42,36 +45,70 @@ body {
     </section>
 
     <section class="features">
+        {% if role == 0 %}
         <div class="feature-card">
-            <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="渔场信息">
+            <img src="{{ url_for('static', filename='images/image6.jpg') }}" alt="渔场信息">
             <h3>渔场信息</h3>
-            <p>用于集中展示各渔场的基本信息、地理位置、实时天气、水质指标以及鱼群的种类与尺寸等关键数据。</p>
+            <p>集中展示渔场基本信息、地理位置、天气、水质和鱼群种类与尺寸等数据，用户可图形化查看运行状态，可直观掌握渔场运行状态，实现科学管理。</p>
             <a class="btn" href="{{ url_for('fish_farms') }}">进入</a>
         </div>
         <div class="feature-card">
             <img src="{{ url_for('static', filename='images/image2.jpg') }}" alt="用户管理">
             <h3>用户管理</h3>
-            <p>后台管理功能，用于对系统内的所有用户进行统一管理。可以查看用户信息、分配权限，并对违规用户执行禁用、删除等操作，确保系统的正常运行与数据安全。</p>
+            <p>系统的后台管理功能，对系统内的所有用户进行统一管理，查看信息、分配权限，并对违规用户进行禁用或删除，保障系统安全稳定运行。</p>
             <a class="btn" href="{{ url_for('admin_users') }}">进入</a>
         </div>
         <div class="feature-card">
             <img src="{{ url_for('static', filename='images/image3.jpg') }}" alt="操作日志">
             <h3>操作日志</h3>
-            <p>记录用户在系统中的关键操作行为，如注册、登录、信息修改等。通过对用户操作进行详细追踪与存档，管理员可以及时掌握系统使用情况，提升管理效率，并在出现异常行为时进行溯源与审计。</p>
+            <p>记录用户注册、登录等操作，帮助管理员对用户操作进行详细追踪与存档，掌握系统使用情况，提升管理效率，在出现异常行为时进行溯源与审计。</p>
             <a class="btn" href="{{ url_for('admin_logs') }}">进入</a>
         </div>
         <div class="feature-card">
-            <img src="{{ url_for('static', filename='images/image4.jpg') }}" alt="数据中心">
+            <img src="{{ url_for('static', filename='images/image7.jpg') }}" alt="数据中心">
             <h3>数据中心</h3>
-            <p>数据中心模块，提供个性化的渔场信息展示功能，可通过该模块实时查看所属渔场的最新水质监测数据、环境变化情况等关键信息，便于科学管理与养殖决策。</p>
+            <p>提供个性化的渔场信息展示功能，养殖户可通过该模块实时查看所属渔场的最新水质监测数据、环境变化情况等信息，便于科学管理与养殖决策。</p>
             <a class="btn" href="{{ url_for('datas') }}">进入</a>
         </div>
         <div class="feature-card">
             <img src="{{ url_for('static', filename='images/image5.jpg') }}" alt="智能中心">
             <h3>智能中心</h3>
-            <p>应用AI技术提供预测、异常预警和辅助决策支持。</p>
+            <p>系统的特色功能区，集成了图片识别、鱼类体长数据预测、智能问答等人工智能技术，提升用户体验，助力渔业管理向数字化、智能化迈进。</p>
             <a class="btn" href="{{ url_for('AI_center') }}">进入</a>
         </div>
+        {% elif role == 1 %}
+        <div class="feature-card">
+            <img src="{{ url_for('static', filename='images/image6.jpg') }}" alt="渔场信息">
+            <h3>渔场信息</h3>
+            <p>集中展示渔场基本信息、地理位置、天气、水质和鱼群种类与尺寸等数据，用户可图形化查看运行状态，可直观掌握渔场运行状态，实现科学管理。</p>
+            <a class="btn" href="{{ url_for('fish_farms') }}">进入</a>
+        </div>
+        <div class="feature-card">
+            <img src="{{ url_for('static', filename='images/image7.jpg') }}" alt="数据中心">
+            <h3>数据中心</h3>
+            <p>提供个性化的渔场信息展示功能，养殖户可通过该模块实时查看所属渔场的最新水质监测数据、环境变化情况等信息，便于科学管理与养殖决策。</p>
+            <a class="btn" href="{{ url_for('datas') }}">进入</a>
+        </div>
+        <div class="feature-card">
+            <img src="{{ url_for('static', filename='images/image5.jpg') }}" alt="智能中心">
+            <h3>智能中心</h3>
+            <p>系统的特色功能区，集成了图片识别、鱼类体长数据预测、智能问答等人工智能技术，提升用户体验，助力渔业管理向数字化、智能化迈进。</p>
+            <a class="btn" href="{{ url_for('AI_center') }}">进入</a>
+        </div>
+        {% elif role == 2 %}
+        <div class="feature-card">
+            <img src="{{ url_for('static', filename='images/image6.jpg') }}" alt="渔场信息">
+            <h3>渔场信息</h3>
+            <p>集中展示渔场基本信息、地理位置、天气、水质和鱼群种类与尺寸等数据，用户可图形化查看运行状态，可直观掌握渔场运行状态，实现科学管理。</p>
+            <a class="btn" href="{{ url_for('fish_farms') }}">进入</a>
+        </div>
+        <div class="feature-card">
+            <img src="{{ url_for('static', filename='images/image5.jpg') }}" alt="智能中心">
+            <h3>智能中心</h3>
+            <p>系统的特色功能区，集成了图片识别、鱼类体长数据预测、智能问答等人工智能技术，提升用户体验，助力渔业管理向数字化、智能化迈进。</p>
+            <a class="btn" href="{{ url_for('AI_center') }}">进入</a>
+        </div>
+        {% endif %}
     </section>
 
     <footer>
