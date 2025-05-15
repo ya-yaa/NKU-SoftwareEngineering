@@ -1,9 +1,10 @@
 body {
     font-family: Arial, sans-serif;
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Change from center to flex-start */
-    height: 100vh;
+    flex-direction: column; /* 添加这一行 */
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
     margin: 0;
     background-color: #f4f4f9;
 }
@@ -185,4 +186,128 @@ button:hover {
     content: " ⬇"; /* 添加下载图标 */
     font-size: 0.8em; /* 图标稍小 */
     margin-left: 3px; /* 图标与文本之间有间距 */
+}
+
+header {
+    background-color: #0056b3;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 32px;
+}
+
+.intro-banner {
+    width: 100%;
+    background-color: transparent;
+    padding: 40px 20px;
+}
+
+.intro-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+
+.intro-content img {
+    width: 40%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.intro-text {
+    flex: 1;
+    color: white;
+}
+
+.intro-text h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card img {
+    width: 100%;
+    max-width: 250px;  /* 限制最大宽度 */
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+
+.feature-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.logout {
+    color: #dc3545;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.logout:hover {
+    text-decoration: underline;
+}
+
+
+.page-header {
+    background-color: transparent; /* 去掉背景色 */
+    text-align: center;
+    padding: 30px 0 20px;
+}
+
+.page-header h1 {
+    font-family: 'HarmonyOS Sans', 'Noto Sans SC', '思源黑体', 'Microsoft YaHei', sans-serif;
+    font-size: 50px;
+    font-weight: 600;
+    color: #fefefe; 
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1); 
+    margin: 0;
 }

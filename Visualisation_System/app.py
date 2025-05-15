@@ -12,7 +12,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Root12345!',
+    'password': '123456',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -222,29 +222,53 @@ def add_user():
     return render_template('add_user.html')
 
 # 渔场列表与搜索页面
-@app.route('/fish_farms', methods=['GET', 'POST'])
+@app.route('/fish_farms', methods=['GET'])
 def fish_farms():
-    search_query = request.form.get('search', '')
+    # 获取查询参数
+    search_query = request.args.get('search', '').strip()
+    page = int(request.args.get('page', 1))
+    per_page = 10  # 每页10条
+    offset = (page - 1) * per_page
 
-    # 创建数据库连接
+    # 连接数据库
     conn = pymysql.connect(**db_config)
     cursor = conn.cursor()
 
-    # 搜索渔场
+    # 构建查询
+    like_pattern = f"%{search_query}%"
     if search_query:
-        cursor.execute("SELECT * FROM fish_farms WHERE section_name LIKE %s OR river_basin LIKE %s OR province LIKE %s", 
-                    ('%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%'))
+        # 获取总记录数
+        cursor.execute("""
+            SELECT COUNT(*) FROM fish_farms 
+            WHERE section_name LIKE %s OR river_basin LIKE %s OR province LIKE %s
+        """, (like_pattern, like_pattern, like_pattern))
+        total = cursor.fetchone()[0]
+
+        # 获取当前页数据
+        cursor.execute("""
+            SELECT * FROM fish_farms 
+            WHERE section_name LIKE %s OR river_basin LIKE %s OR province LIKE %s
+            LIMIT %s OFFSET %s
+        """, (like_pattern, like_pattern, like_pattern, per_page, offset))
     else:
-        cursor.execute("SELECT * FROM fish_farms")
+        cursor.execute("SELECT COUNT(*) FROM fish_farms")
+        total = cursor.fetchone()[0]
 
+        cursor.execute("SELECT * FROM fish_farms LIMIT %s OFFSET %s", (per_page, offset))
 
-    # 获取渔场列表
     fish_farms = cursor.fetchall()
     conn.close()
 
-    return render_template('fish_farms.html', fish_farms=fish_farms, search_query=search_query)
+    total_pages = (total + per_page - 1) // per_page
 
-import requests
+    return render_template(
+        'fish_farms.html',
+        fish_farms=fish_farms,
+        search_query=search_query,
+        page=page,
+        total_pages=total_pages
+    )
+
 
 @app.route('/fish_farm/<int:farm_id>')
 def view_fish_farm(farm_id):

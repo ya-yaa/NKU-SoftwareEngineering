@@ -5,40 +5,132 @@
     <title>渔场信息</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            padding: 30px;
+            color: #333;
         }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .search-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
         input[type="text"] {
             width: 300px;
-            padding: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+            outline: none;
         }
+
+        button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .actions a, .actions button {
+            margin: 5px;
+            padding: 8px 16px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .actions a:hover, .actions button:hover {
+            background-color: #27ae60;
+        }
+
+        .pagination {
+            text-align: center;
             margin-top: 20px;
         }
-        th, td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
+
+        .pagination a, .pagination strong {
+            margin: 0 4px;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 4px;
+            color: #333;
+            background-color: #ecf0f1;
         }
-        th {
-            background-color: #f4f4f4;
+
+        .pagination strong {
+            font-weight: bold;
+            background-color: #3498db;
+            color: white;
         }
-        .search-form {
-            margin-bottom: 10px;
+
+        .pagination a:hover {
+            background-color: #bdc3c7;
+        }
+
+        p {
+            text-align: center;
+            color: #888;
         }
     </style>
 </head>
 <body>
+
     <h1>渔场信息一览</h1>
 
-    <form method="POST" class="search-form">
+    <form method="GET" class="search-form">
         <input type="text" name="search" placeholder="请输入渔场名称..." value="{{ search_query }}">
         <button type="submit">搜索</button>
     </form>
 
-    <br>
-    <a href="{{ url_for('home') }}">返回首页</a>
+    <div class="actions">
+        
+        <a href="{{ url_for('home') }}">返回首页</a>
+    </div>
 
     {% if fish_farms %}
     <table>
@@ -65,11 +157,49 @@
             {% endfor %}
         </tbody>
     </table>
-    
+
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="{{ url_for('fish_farms', search=search_query, page=1) }}">首页</a>
+            <a href="{{ url_for('fish_farms', search=search_query, page=page - 1) }}">« 上一页</a>
+        {% endif %}
+
+        {% set start_page = (1 if page - 2 < 1 else page - 2) %}
+        {% set end_page = (total_pages if page + 2 > total_pages else page + 2) %}
+
+
+        {% if start_page > 1 %}
+            <a href="{{ url_for('fish_farms', search=search_query, page=1) }}">1</a>
+            {% if start_page > 2 %}
+                <span>...</span>
+            {% endif %}
+        {% endif %}
+
+        {% for p in range(start_page, end_page + 1) %}
+            {% if p == page %}
+                <strong>{{ p }}</strong>
+            {% else %}
+                <a href="{{ url_for('fish_farms', search=search_query, page=p) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if end_page < total_pages %}
+            {% if end_page < total_pages - 1 %}
+                <span>...</span>
+            {% endif %}
+            <a href="{{ url_for('fish_farms', search=search_query, page=total_pages) }}">{{ total_pages }}</a>
+        {% endif %}
+
+        {% if page < total_pages %}
+            <a href="{{ url_for('fish_farms', search=search_query, page=page + 1) }}">下一页 »</a>
+            <a href="{{ url_for('fish_farms', search=search_query, page=total_pages) }}">尾页</a>
+        {% endif %}
+</div>
+
+
     {% else %}
         <p>未找到任何渔场。</p>
     {% endif %}
 
-    
 </body>
 </html>
