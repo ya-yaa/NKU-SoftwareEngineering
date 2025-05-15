@@ -9,7 +9,11 @@
   <label>密码（留空不修改）: <input type="password" name="password"></label><br><br>
   <label>电话: <input type="text" name="phone" value="{{ user[3] }}"></label><br><br>
   <label>角色（0=管理员，1=养殖户，2=普通用户）: <input type="number" name="role" value="{{ user[2] }}" required></label><br><br>
-  <input type="submit" value="保存修改">
+  <!-- 按钮并排放置 -->
+  <div style="display: flex; gap: 10px;">
+    <input type="submit" value="保存修改" class="logout-button" style="background-color: #007bff;">
+    <a href="{{ url_for('admin_users') }}" class="logout-button" style="background-color: gray; display: inline-block; text-align: center; text-decoration: none;">返回用户管理</a>
+  </div>
 </form>
-<a href="{{ url_for('admin_users') }}">返回用户管理</a>
+
 {% endblock %}
