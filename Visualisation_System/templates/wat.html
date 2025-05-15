@@ -9,19 +9,21 @@
             font-family: Arial, sans-serif;
             background-color: #023776;
             color: white;
+            min-height: 100vh;
+            min-width: 100vw;
         }
         .data-container {
-            width:1000px;
+            width:80%;
             float: left;
-            margin-left: 10px;
+            margin-left: 2%;
             border-color: white;
         }
         #chart {
             position: absolute;
-            right: 100px;
+            left: 50%;
             top: 0px;
-            width: 550px;
-            height: 550px;
+            width: 60%;
+            height: 60%;
             float: right;
         }
         .data-item {
@@ -56,12 +58,12 @@
             text-align: right;
         }
         #chart1 {
-            width: 1600px;
-            height: 400px;
+            width: 96%;
+            height: 45%;
             position: fixed;
-            top: 500px;
-            left: 20px;
-            border-radius: 10px;
+            top: 53%;
+            left: 2%;
+            border-radius: 5%;
         }
         .legend {
             position: absolute;
@@ -92,8 +94,17 @@
         }
         h2.title-left {
             position: fixed;
-            left: 10px;
-            top: 380px;
+            left: 5%;  /* 距离左侧为父元素宽度的5%，可根据实际需求调整 */
+            top: 40%;  /* 距离顶部为父元素高度的40%，可根据实际需求调整 */
+            margin: 0;
+            padding: 10px;
+            font-size: 30px;
+            border-radius: 10px;
+        }
+        h2.title-right {
+            position: fixed;
+            left: 60%;  /* 距离左侧为父元素宽度的80%，可根据实际需求调整 */
+            top: 1%;  /* 距离顶部为父元素高度的1%，可根据实际需求调整 */
             margin: 0;
             padding: 10px;
             font-size: 30px;
@@ -101,16 +112,16 @@
         }
         .selection-container {
             position: fixed;
-            left: 20px;
-            top: 450px;
+            left: 2%;
+            top: 48%;
             gap: 20px;  /* 选择框之间的间距 */
             margin-bottom: 20px;
             background-color:#023776;
         }
         .white-box {
             position: fixed; /* 固定位置 */
-            left: 20px; /* 距离左侧的距离 */
-            top: 440px; /* 距离顶部的距离 */
+            left: 2%; /* 距离左侧的距离 */
+            top: 48%; /* 距离顶部的距离 */
             width: 70px; /* 方框的宽度 */
             height: 20px; /* 方框的高度 */
             background-color: #023776; /* 方框的背景颜色 */
@@ -172,7 +183,7 @@
         </div>
     </div>
     </div>
-    <h2 style="text-align: left;font-size: 30px;">鱼群种类统计</h2>
+    <h2 style="text-align: left;font-size: 30px;" class="title-right">鱼群种类统计</h2>
     <div id="chart"></div>
     <script>
         var chartDom = document.getElementById('chart');
@@ -181,7 +192,7 @@
         option = {
             title: {
                
-                left: 'center',
+                left: '100%',
                 top: '10%',
                 textStyle: {
                     color: 'white'
@@ -192,7 +203,7 @@
             },
             legend: {
                 orient: 'vertical',
-                right: '85%',
+                right: '75%',
                 top: 'middle',
                 textStyle: {  // 添加 textStyle 属性来设置标签颜色
             color: '#fff'  // 这里设置为白色，你可以改为任意想要的颜色，如十六进制颜色值、RGB 颜色值等
