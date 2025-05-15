@@ -1,43 +1,131 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<style>
-body {
-    background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-</style>
 <head>
     <meta charset="UTF-8">
     <title>智能中心</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 60px auto;
             padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
         }
-        .links a {
-            display: block;
-            margin: 10px 0;
-            font-size: 18px;
-            color: #007BFF;
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #f9fbfc;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #7cb0e8;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .card a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 6px;
             text-decoration: none;
+            transition: background-color 0.3s ease;
         }
-        .links a:hover {
-            text-decoration: underline;
+
+        .card a:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            display: block;
+            margin: 40px auto 10px;
+            padding: 10px 24px;
+            text-align: center;
+            background-color: gray;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            width: 160px;
+        }
+
+        .back-button:hover {
+            background-color: #444;
         }
     </style>
 </head>
 <body>
 
-    <div class="links">
-        <a href="{{ url_for('image_recognition') }}">图片识别</a>
-        <a href="{{ url_for('fish_length_prediction') }}">鱼类体长预测</a>
-        <a href="{{ url_for('ai_qa') }}">智能问答</a>
+    <div class="container">
+        <h1>🤖 欢迎来到智能中心！🤖</h1>
+
+        <div class="card-grid">
+
+            <!-- 图片识别卡片 -->
+            <div class="card">
+                <h2>图片识别</h2>
+                <p>上传鱼类图片，自动识别种类，实现渔业智能识别分析。</p>
+                <a href="{{ url_for('image_recognition') }}">进入功能</a>
+            </div>
+
+            <!-- 鱼类体长预测卡片 -->
+            <div class="card">
+                <h2>鱼类体长预测</h2>
+                <p>输入鱼类图像或参数，预测鱼体长度，辅助养殖决策。</p>
+                <a href="{{ url_for('fish_length_prediction') }}">进入功能</a>
+            </div>
+
+            <!-- 智能问答卡片 -->
+            <div class="card">
+                <h2>智能问答</h2>
+                <p>基于AI模型，为你解答渔业问题，快速获取实用知识。</p>
+                <a href="{{ url_for('ai_qa') }}">进入功能</a>
+            </div>
+
+        </div>
+
+        <a href="{{ url_for('home') }}" class="back-button">返回首页</a>
     </div>
 
-    <br>
-    <a href="{{ url_for('home') }}">返回首页</a>
 </body>
 </html>

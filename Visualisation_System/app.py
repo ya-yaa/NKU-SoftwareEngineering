@@ -12,7 +12,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'yuxin173',
+    'password': '123456',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
