@@ -6,89 +6,159 @@
     <style>
         body {
             font-family: "Helvetica Neue", Arial, sans-serif;
+            background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             background-color: #f4f8fb;
             color: #333;
             padding: 20px;
-            max-width: 900px;
+            max-width: 1200px;
             margin: auto;
         }
 
-        h1, h2 {
-            color: #2c3e50;
+        h1 {
+            color: #ebf3fb;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 36px;
+            letter-spacing: 2px;
         }
 
         a {
             display: inline-block;
-            margin: 15px 0;
-            padding: 8px 16px;
-            background-color: #3498db;
+            margin: 10px 10px 30px 0;
+            padding: 10px 20px;
+            background-color: #59b3ef;
             color: #fff;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             transition: background-color 0.3s ease;
+            font-weight: bold;
         }
 
         a:hover {
             background-color: #2980b9;
         }
 
-        .weather-info, .video-section {
-            background-color: #ffffff;
-            border: 1px solid #dcdcdc;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 25px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .box {
+            flex: 1;
+            background: linear-gradient(to bottom right, #ffffff, #f1f9ff);
+            border: 1px solid #cde4f9;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
+
+        .box:hover {
+            transform: translateY(-4px);
+        }
+
+        .box h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        .box p, .box li {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.8;
+            margin: 8px 0;
         }
 
         .weather-info ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
-        .weather-info li {
-            padding: 5px 0;
-            border-bottom: 1px solid #eee;
+        .weather-info li::before {
+            content: "🌤️ ";
+            margin-right: 6px;
         }
 
-        .weather-info li:last-child {
-            border-bottom: none;
+        .weather-info li:nth-child(2)::before { content: "🌧️ "; }
+        .weather-info li:nth-child(3)::before { content: "🔥 "; }
+        .weather-info li:nth-child(4)::before { content: "❄️ "; }
+
+        .video-section {
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+        }
+
+        .video-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
         }
 
         .video-section video {
             display: block;
             max-width: 100%;
-            margin-top: 15px;
-            border-radius: 8px;
+            margin-top: 10px;
+            border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+        .button-group {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-        p {
-            line-height: 1.6;
+
+        @media screen and (max-width: 768px) {
+            .flex-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <h1>渔场详情</h1>
-    <p><strong>渔场ID:</strong> {{ farm[0] }}</p>
-    <p><strong>渔场主ID:</strong> {{ farm[1] }}</p>
-    <p><strong>省份:</strong> {{ farm[2] }}</p>
-    <p><strong>所属流域:</strong> {{ farm[3] }}</p>
-    <a href="{{ url_for('fish_farms') }}">返回渔场列表</a>
-    <a href="{{ url_for('v_fish_farm', farm_id=farm[0]) }}">查看水质、鱼类信息</a>
-    
-    <div class="weather-info">
-        <h2>当前天气</h2>
-        <ul>
-            <li><strong>当前温度：</strong>{{ current_temp }} ℃</li>
-            <li><strong>当前降雨量：</strong>{{ current_rain }} mm</li>
-            <li><strong>今日最高气温：</strong>{{ today_temp_max }} ℃</li>
-            <li><strong>今日最低气温：</strong>{{ today_temp_min }} ℃</li>
-        </ul>
+
+    <div class="button-group">
+        <a href="{{ url_for('fish_farms') }}">返回渔场列表</a>
+        <a href="{{ url_for('v_fish_farm', farm_id=farm[0]) }}">查看水质、鱼类信息</a>
     </div>
 
+
+    <div class="flex-container">
+        <!-- 左侧：渔场详情 -->
+        <div class="box">
+            <h2>📍 渔场基本信息</h2>
+            <p><strong>🆔 渔场ID:</strong> {{ farm[0] }}</p>
+            <p><strong>👤 渔场主ID:</strong> {{ farm[1] }}</p>
+            <p><strong>🗺️ 所在省份:</strong> {{ farm[2] }}</p>
+            <p><strong>🌊 所属流域:</strong> {{ farm[3] }}</p>
+        </div>
+
+        <!-- 右侧：天气信息 -->
+        <div class="box weather-info">
+            <h2>☁️ 当前天气情况</h2>
+            <ul>
+                <li><strong>当前温度：</strong>{{ current_temp }} ℃</li>
+                <li><strong>当前降雨量：</strong>{{ current_rain }} mm</li>
+                <li><strong>今日最高气温：</strong>{{ today_temp_max }} ℃</li>
+                <li><strong>今日最低气温：</strong>{{ today_temp_min }} ℃</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 视频模块 -->
     <div class="video-section">
-        <h2>渔场视频展示</h2>
+        <h2>🎥 渔场视频展示</h2>
         {% if video_url %}
             <video controls>
                 <source src="{{ video_url }}" type="video/mp4">
