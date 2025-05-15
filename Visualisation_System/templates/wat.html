@@ -7,13 +7,14 @@
     <style>
     body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #4b4848;
+            background-color: #023776;
+            color: white;
         }
         .data-container {
             width:1000px;
             float: left;
             margin-left: 10px;
+            border-color: white;
         }
         #chart {
             position: absolute;
@@ -35,9 +36,9 @@
         }
 
         .progress-bar-container {
-            background-color: #aaa7a7;
+            background-color: rgb(191, 193, 230);
             height: 20px;
-            
+            border-color: white;
             border-radius: 5px;
             overflow: hidden;
             width: 500px;
@@ -46,7 +47,7 @@
 
         .progress-bar {
             height: 100%;
-            background-color: #6699ff;
+            background-color: #4c6baa;
             transition: width 0.3s ease;
         }
 
@@ -104,7 +105,7 @@
             top: 450px;
             gap: 20px;  /* 选择框之间的间距 */
             margin-bottom: 20px;
-            background-color:#f4f4f9;
+            background-color:#023776;
         }
         .white-box {
             position: fixed; /* 固定位置 */
@@ -112,8 +113,8 @@
             top: 440px; /* 距离顶部的距离 */
             width: 70px; /* 方框的宽度 */
             height: 20px; /* 方框的高度 */
-            background-color: #f4f4f9; /* 方框的背景颜色 */
-            border: 1px solid #f4f4f9; /* 方框的边框 */
+            background-color: #023776; /* 方框的背景颜色 */
+            border: 1px solid #023776; /* 方框的边框 */
             padding: 10px; /* 内边距 */
            /* 添加阴影效果 */
         }
@@ -177,14 +178,13 @@
         var chartDom = document.getElementById('chart');
         var myChart = echarts.init(chartDom);
         var option;
-
         option = {
             title: {
                
                 left: 'center',
                 top: '10%',
                 textStyle: {
-                    color: '#ff0000'
+                    color: 'white'
                 }
             },
             tooltip: {
@@ -194,7 +194,18 @@
                 orient: 'vertical',
                 right: '85%',
                 top: 'middle',
-                data: ['Bream', 'Roach', 'Whitefish', 'Parkki','Perch','Pike','Smelt']
+                textStyle: {  // 添加 textStyle 属性来设置标签颜色
+            color: '#fff'  // 这里设置为白色，你可以改为任意想要的颜色，如十六进制颜色值、RGB 颜色值等
+        },
+                data: [
+                        { name: 'Bream' ,itemStyle: { color: '#A8E6CE' }},
+                        { name: 'Roach' ,itemStyle: { color: '#CFFAFE' }},
+                        { name: 'Whitefish' ,itemStyle: { color: '#95A8C5' }},
+                        { name: 'Parkki' ,itemStyle: { color: '#FAFAD2' }},
+                        { name: 'Perch' ,itemStyle: { color: '#EBEEBF' }},
+                        { name: 'Pike' ,itemStyle: { color: '#95A3C6' }},
+                        { name: 'Smelt' ,itemStyle: { color: '#5470C6' }}
+                    ]
             },
             series: [
                 {
@@ -204,7 +215,8 @@
                     avoidLabelOverlap: false,
                     label: {
                         show: false,
-                        position: 'center'
+                        position: 'center',
+                        
                     },
                     emphasis: {
                         label: {
@@ -247,7 +259,7 @@
     </select>
 
     <label for="viewObject">选择查看信息种类：</label>
-    <select id="viewObject" style="color: black; background-color: #f4f4f9; border: 1px solid #ccc;">
+    <select id="viewObject" style="color: white; background-color: #023776; border: 1px solid white;">
         <option value="Weight(g)">重量 (g)</option>
         <option value="Length1(cm)">长度1 (cm)</option>
         <option value="Length2(cm)">长度2 (cm)</option>
@@ -298,8 +310,8 @@
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 2,
                         pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
+                        pointBorderColor: 'white',
+                        pointHoverBackgroundColor: 'white',
                         pointHoverBorderColor: 'rgba(75, 192, 192, 1)',
                         tension: 0.3,
                         fill: true
@@ -314,35 +326,42 @@
                         intersect: false
                     },
                     legend: {
-                        position: 'top'
+                        display: false,
                     }
                 },
                 scales: {
                     x: {
-                        title: {
-                            display: true,
-                            text: '种类'
-                        },
-                        grid: {
-                            display: true
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: selectedObject,
-                            fontSize:20
-
-                        },
-                        grid: {
-                            display: true
-                        },
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }
+                title: {
+                    display: true,
+                    text: '种类',
+                    color: 'white' // X轴标题颜色
+                },
+                grid: {
+                    display: true,
+                    color: '#5897C1' // X轴网格线颜色
+                },
+                ticks: {
+                    color: 'white' // X轴刻度标签颜色
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: selectedObject,
+                    fontSize: 20,
+                    color: 'white' // Y轴标题颜色
+                },
+                grid: {
+                    display: true,
+                    color: '#5897C1' // Y轴网格线颜色
+                },
+                ticks: {
+                    beginAtZero: true,
+                    color: 'white' // Y轴刻度标签颜色
                 }
             }
+                            }
+                        }
         });
     }
 

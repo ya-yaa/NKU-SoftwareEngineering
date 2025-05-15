@@ -241,6 +241,9 @@ header {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     transition: transform 0.3s ease;
 }
@@ -254,17 +257,17 @@ header {
     max-width: 250px;  /* 限制最大宽度 */
     height: auto;
     object-fit: contain;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 .feature-card h3 {
     font-size: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .feature-card p {
     font-size: 14px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .btn {
@@ -302,7 +305,11 @@ footer {
     text-align: center;
     padding: 30px 0 20px;
 }
-
+.user-info {
+    display: flex;
+    gap: 20px; /* 元素之间间隔 */
+    font-size: 16px;
+}
 .page-header h1 {
     font-family: 'HarmonyOS Sans', 'Noto Sans SC', '思源黑体', 'Microsoft YaHei', sans-serif;
     font-size: 50px;
@@ -311,3 +318,4 @@ footer {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1); 
     margin: 0;
 }
+
