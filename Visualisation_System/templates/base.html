@@ -1,5 +1,3 @@
-<!-- 管理员用户管理基础模板界面 -->
-
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -7,15 +5,22 @@
   <title>{% block title %}管理系统{% endblock %}</title>
   <style>
     body {
+      background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
       font-family: "Segoe UI", sans-serif;
       margin: 40px auto;
       max-width: 900px;
       background-color: #f9f9f9;
+      font-size: 18px; /* 增大整体字体大小 */
     }
 
     h1, h2 {
       text-align: center;
-      color: #333;
+      color: white;
+      font-size: 36px; /* 增大标题字体大小 */
     }
 
     header, footer {
@@ -27,16 +32,19 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      background-color: white; /* 添加这行 */
+      font-size: 18px; /* 增大表格字体大小 */
     }
 
     th, td {
       border: 1px solid #ccc;
-      padding: 8px 12px;
+      padding: 16px 24px; /* 增大单元格内边距 */
       text-align: left;
     }
 
     th {
       background-color: #eee;
+      font-size: 18px; /* 增大表头字体大小 */
     }
 
     input[type="text"], input[type="password"], input[type="number"] {
@@ -44,8 +52,9 @@
       padding: 8px;
       margin-top: 5px;
       margin-bottom: 15px;
-      border: 1px solid #ccc;
+      border: 1px solid white;
       border-radius: 4px;
+      font-size: 18px; /* 增大输入框字体大小 */
     }
 
     input[type="submit"], button {
@@ -55,6 +64,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 18px; /* 增大按钮字体大小 */
     }
 
     input[type="submit"]:hover, button:hover {
@@ -65,6 +75,7 @@
       text-decoration: none;
       color: #007bff;
       margin-right: 10px;
+      font-size: 18px; /* 增大链接字体大小 */
     }
 
     a:hover {
@@ -74,6 +85,9 @@
     .form-section {
       max-width: 500px;
       margin: auto;
+      padding: 20px; /* 添加一些内边距以增加美观性 */
+      background-color: white;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 可选：添加阴影效果 */
     }
 
     ul {
@@ -84,13 +98,35 @@
     .actions form {
       display: inline;
     }
+
+    /* 新增样式 */
+    .current-user {
+      color: white; /* 修改这行 */
+      font-size: 18px; /* 增大当前用户信息字体大小 */
+    }
+    
+  /* 添加新的样式以使“退出登录”链接看起来像一个按钮 */
+  .logout-button {
+    padding: 6px 12px;
+    background-color: #007bff; /* 设置背景颜色为蓝色 */
+    color: white; /* 设置文本颜色为白色 */
+    border: none; /* 移除边框 */
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none; /* 移除默认的下划线 */
+    font-size: 18px; /* 增大退出登录按钮字体大小 */
+  }
+
+  .logout-button:hover {
+    background-color: #0056b3; /* 悬停时改变背景颜色 */
+  }
   </style>
 </head>
 <body>
   <header>
     <h1>用户管理系统</h1>
     {% if session.username %}
-      <p>当前用户：{{ session.username }} | 角色：{{ session.role }} | <a href="{{ url_for('logout') }}">退出登录</a></p>
+      <p class="current-user">当前用户：{{ session.username }} <a href="{{ url_for('logout') }}" class="logout-button">退出登录</a></p>
     {% endif %}
     <hr>
   </header>
