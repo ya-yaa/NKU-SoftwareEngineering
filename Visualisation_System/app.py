@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import requests
 import csv
+import os
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
 
@@ -312,8 +313,13 @@ def v_fish_farm(farm_id):
     cursor = conn.cursor()
 
     # 获取渔场信息
-    # 示例用法
-    csv_path = "Fish.csv"  # CSV文件路径
+    # csv_path = "Fish.csv"  # CSV文件路径
+
+    # 获取当前文件（app.py）所在目录的绝对路径
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    # 拼接得到 CSV 文件的完整路径
+    csv_path = os.path.join(base_dir, "Fish.csv")
+
     fish_data = csv_to_json_array(csv_path)
     # 修正后的 SQL 查询，添加 source_a 条件
     cursor.execute("SELECT * FROM water_quality_data WHERE farm_id = %s AND source_date = %s", (farm_id, '2020-05-08'))
