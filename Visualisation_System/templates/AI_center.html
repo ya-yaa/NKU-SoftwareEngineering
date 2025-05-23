@@ -63,18 +63,36 @@
             margin-bottom: 20px;
         }
 
-        .card a {
+        .card a, .card button {
             display: inline-block;
             padding: 10px 20px;
             background-color: #007BFF;
             color: white;
             border-radius: 6px;
             text-decoration: none;
-            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
 
-        .card a:hover {
+        .card a:hover, .card button:hover {
             background-color: #0056b3;
+        }
+
+        .upload-form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .upload-form input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f3ff;
+            border-left: 5px solid #007BFF;
+            border-radius: 8px;
         }
 
         .back-button {
@@ -92,40 +110,174 @@
         .back-button:hover {
             background-color: #444;
         }
+
+        .card-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .card-button:hover {
+        background-color: #0056b3;
+    }
+
+    .custom-file-upload {
+    display: inline-block;
+    padding: 6px 14px;         
+    font-size: 14px;             
+    background-color: #6c757d;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.custom-file-upload:hover {
+    background-color: #5a6268;
+}
+
+.custom-file-upload input[type="file"] {
+    display: none;
+}
+
+.preview-container {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f0f6ff;
+    border: 1px solid #cce0ff;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: inset 0 1px 6px rgba(0, 123, 255, 0.1);
+}
+
+.preview-container strong {
+    color: #007BFF;
+    font-size: 15px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.preview-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.preview-image:hover {
+    transform: scale(1.02);
+}
+
+.suggest-button {
+    margin-top: 12px;
+    padding: 6px 16px;
+    background-color: #28a745;
+    color: white;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.suggest-button:hover {
+    background-color: #218838;
+}
+
+.suggest-box {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #e6f9ec;
+    border-left: 5px solid #28a745;
+    border-radius: 8px;
+    color: #2c5f2d;
+}
+
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🤖 欢迎来到智能中心！🤖</h1>
+<div class="container">
+    <h1>🤖 欢迎来到智能中心！🤖</h1>
 
-        <div class="card-grid">
+    <div class="card-grid">
 
-            <!-- 图片识别卡片 -->
-            <div class="card">
-                <h2>图片识别</h2>
-                <p>上传鱼类图片，自动识别种类，实现渔业智能识别分析。</p>
-                <a href="{{ url_for('image_recognition') }}">进入功能</a>
-            </div>
+        <!-- 图片识别卡片 -->
+       <div class="card">
+        <h2>图片识别</h2>
+        <p>上传鱼类图片，自动识别种类，实现渔业智能识别分析。</p>
 
-            <!-- 鱼类体长预测卡片 -->
-            <div class="card">
-                <h2>鱼类体长预测</h2>
-                <p>输入鱼类图像或参数，预测鱼体长度，辅助养殖决策。</p>
-                <a href="{{ url_for('fish_length_prediction') }}">进入功能</a>
-            </div>
+        <form class="upload-form" method="post" action="{{ url_for('image_recognition') }}" enctype="multipart/form-data">
+            <label class="custom-file-upload">
+                <input type="file" name="image" accept="image/*" required>
+                选择图片
+            </label>
+            <br><br>
+            <button type="submit" class="card-button">上传识别</button>
+        </form>
 
-            <!-- 智能问答卡片 -->
-            <div class="card">
-                <h2>智能问答</h2>
-                <p>基于AI模型，为你解答渔业问题，快速获取实用知识。</p>
-                <a href="{{ url_for('ai_qa') }}">进入功能</a>
-            </div>
+        {% if img_data %}
+         <div style="margin-bottom: 10px;">
+            <strong>上传图片：</strong><br>
+            <img src="data:image/jpeg;base64,{{ img_data }}" alt="Uploaded Image" style="max-width: 100%; border-radius: 8px; margin-top: 10px;">
+        </div>
+        {% endif %}
+        
+        
 
+        {% if result %}
+        <div class="result-box">
+            <strong>识别结果：</strong>
+            <p>{{ result }}</p>
+
+            <!-- 养殖建议按钮表单 -->
+            <form method="post" action="{{ url_for('image_recognition') }}">
+                <input type="hidden" name="fish_type" value="{{ result }}">
+                <input type="hidden" name="img_data" value="{{ img_data }}">
+                <input type="submit" value="查看养殖建议" class="suggest-button">
+            </form>
+        </div>
+        {% endif %}
+
+        {% if suggestion %}
+        <div class="suggest-box">
+            <strong>🐟 {{ fish_type }} 的养殖建议：</strong>
+            <p>{{ suggestion }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+
+
+
+
+        <!-- 鱼类体长预测卡片 -->
+        <div class="card">
+            <h2>鱼类体长预测</h2>
+            <p>输入鱼类图像或参数，预测鱼体长度，辅助养殖决策。</p>
+            <a href="{{ url_for('fish_length_prediction') }}">进入功能</a>
         </div>
 
-        <a href="{{ url_for('home') }}" class="back-button">返回首页</a>
+        <!-- 智能问答卡片 -->
+        <div class="card">
+            <h2>智能问答</h2>
+            <p>基于AI模型，为你解答渔业问题，快速获取实用知识。</p>
+            <a href="{{ url_for('ai_qa') }}">进入功能</a>
+        </div>
+
     </div>
+
+    <a href="{{ url_for('home') }}" class="back-button">返回首页</a>
+</div>
 
 </body>
 </html>

@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, render_template_string
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import requests
 import csv
 import os
+import base64
+from zhipuai import ZhipuAI
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
 
@@ -12,10 +14,12 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Root12345!',
+    'password': '123456',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
+
+client = ZhipuAI(api_key="13680a80f7b9444880e714e04730e260.xAzPHXxzK5CGOFA6") 
 
 # 用户注册
 @app.route('/register', methods=['GET', 'POST'])
@@ -526,7 +530,6 @@ def datas():
     conn.close()
     return render_template('datas.html', data=data)
 
-
 # 智能中心
 @app.route('/AI_center')
 def AI_center():
@@ -536,9 +539,60 @@ def AI_center():
     return render_template('AI_center.html')
 
 # 图片识别
-@app.route('/AI_center/image_recognition')
+@app.route('/AI_center/image_recognition', methods=['GET', 'POST'])
 def image_recognition():
-    return "<h2>图片识别模块（待实现）</h2>"
+    result = None
+    img_data = None
+    fish_type = None
+    suggestion = None
+
+    if request.method == 'POST':
+        if 'image' in request.files:
+            file = request.files['image']
+            if file:
+                img_bytes = file.read()
+                img_data = base64.b64encode(img_bytes).decode('utf-8')
+
+                # 图像识别获取鱼的名称
+                response = client.chat.completions.create(
+                    model="glm-4v-plus-0111",
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "image_url", "image_url": {"url": img_data}},
+                                {"type": "text", "text": "这是什么鱼？请只回答鱼的名称，不需要额外的词语及标点符号"}
+                            ]
+                        }
+                    ]
+                )
+                result = response.choices[0].message.content.strip()
+                fish_type = result
+
+        elif 'fish_type' in request.form:
+            fish_type = request.form['fish_type']
+            result = fish_type  # 确保识别结果仍然显示
+
+            # 如果用户提交了 base64 图片数据，也保留显示
+            img_data = request.form.get('img_data')
+
+            # 生成养殖建议
+            response = client.chat.completions.create(
+                model="glm-4-plus",
+                messages=[
+                    {"role": "system", "content": "你是一个乐于回答各种问题的小助手，你的任务是提供专业、准确、有洞察力的建议。"},
+                    {"role": "user", "content": f"请用一段话提供关于{fish_type}的养殖建议。"}
+                ]
+            )
+            suggestion = response.choices[0].message.content.strip()
+
+    return render_template(
+        'AI_center.html',
+        result=result,
+        img_data=img_data,
+        fish_type=fish_type,
+        suggestion=suggestion
+    )
 
 # 鱼类体长预测
 @app.route('/AI_center/fish_length_prediction')
