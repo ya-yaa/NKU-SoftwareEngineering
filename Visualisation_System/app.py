@@ -12,7 +12,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Root12345!',
+    'password': 'yuxin173',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -329,7 +329,31 @@ def csv_to_json_array(csv_file_path):
             json_array.append(processed_row)
         return json_array
 
-    
+def db_to_json_array():
+    # 连接数据库
+    conn = pymysql.connect(**db_config)
+    mycursor = conn.cursor()
+    # 执行SQL查询语句
+    query = "SELECT species, weight, length1, length2, length3, height, width FROM fishes"
+    mycursor.execute(query)
+    results = mycursor.fetchall()
+
+    json_array = []
+    for row in results:
+        processed_row = {
+            "Species": row[0],
+            "Weight(g)": row[1],
+            "Length1(cm)": row[2],
+            "Length2(cm)": row[3],
+            "Length3(cm)": row[4],
+            "Height(cm)": row[5],
+            "Width(cm)": row[6]
+        }
+        json_array.append(processed_row)
+
+    mycursor.close()
+    conn.close()
+    return json_array 
 
 @app.route('/fish_farm_detail/<int:farm_id>')
 def v_fish_farm(farm_id):
@@ -344,7 +368,7 @@ def v_fish_farm(farm_id):
     # 拼接得到 CSV 文件的完整路径
     csv_path = os.path.join(base_dir, "Fish.csv")
 
-    fish_data = csv_to_json_array(csv_path)
+    fish_data = db_to_json_array()
     # 修正后的 SQL 查询，添加 source_a 条件
     cursor.execute("SELECT * FROM water_quality_data WHERE farm_id = %s AND source_date = %s", (farm_id, '2020-05-08'))
     wat = cursor.fetchone()

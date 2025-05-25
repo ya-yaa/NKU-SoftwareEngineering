@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>水质数据展示</title>
+    <title>水质、鱼类数据展示</title>
     <style>
     body {
             font-family: Arial, sans-serif;
@@ -11,22 +11,60 @@
             color: white;
             min-height: 100vh;
             min-width: 100vw;
+            position: absolute;
+        }
+        h2.title-1 {
+            position: absolute;
+            left: 5%;  /* 距离左侧为父元素宽度的80%，可根据实际需求调整 */
+            top: 1%;  /* 距离顶部为父元素高度的1%，可根据实际需求调整 */
+            margin: 0;
+            padding: 10px;
+            font-size: 30px;
+            border-radius: 10px;
+        }
+        .Btn0 {
+            width: 10%;
+            height: 5%;
+            position: absolute;
+            top: 3%;
+            right: 76%;
+            font-size: 12px;
+            text-decoration: underline;
         }
         .data-container {
             width:80%;
             float: left;
-            top:20%;
-            margin-left: 2%;
+            top:13%;
+            margin-left: 5%;
             border-color: white;
+            position: absolute;
         }
         #chart {
             position: absolute;
-            left: 50%;
-            top: 0px;
-            width: 60%;
-            height: 60%;
-            float: right;
+            left: 55%;
+            width: 50%;
+            height: 50%;
+            top:5%;
         }
+        h2.title-right {
+            position: absolute;
+            left: 60%;  /* 距离左侧为父元素宽度的80%，可根据实际需求调整 */
+            top: 1%;  /* 距离顶部为父元素高度的1%，可根据实际需求调整 */
+            margin: 0;
+            padding: 10px;
+            font-size: 30px;
+            border-radius: 10px;
+        }
+        .Btn1 {
+            width: 10%;
+            height: 5%;
+            position: absolute;
+            top: 3%;
+            right: 21%;
+            font-size: 12px;
+            text-decoration: underline;
+        }
+        
         .data-item {
             display: flex;
             align-items: center;
@@ -66,6 +104,15 @@
             left: 2%;
             border-radius: 5%;
         }
+        .Btn3 {
+            width: 10%;
+            height: 5%;
+            position: absolute;
+            top: 42%;
+            right: 65%;
+            font-size: 12px;
+            text-decoration: underline;
+        }
         .legend {
             position: absolute;
             right: 800px;
@@ -102,15 +149,7 @@
             font-size: 30px;
             border-radius: 10px;
         }
-        h2.title-right {
-            position: absolute;
-            left: 60%;  /* 距离左侧为父元素宽度的80%，可根据实际需求调整 */
-            top: 1%;  /* 距离顶部为父元素高度的1%，可根据实际需求调整 */
-            margin: 0;
-            padding: 10px;
-            font-size: 30px;
-            border-radius: 10px;
-        }
+        
         .selection-container {
             position: fixed;
             left: 2%;
@@ -123,7 +162,7 @@
             position: fixed; /* 固定位置 */
             left: 2%; /* 距离左侧的距离 */
             top: 48%; /* 距离顶部的距离 */
-            width: 70px; /* 方框的宽度 */
+            width: 90px; /* 方框的宽度 */
             height: 20px; /* 方框的高度 */
             background-color: #023776; /* 方框的背景颜色 */
             border: 1px solid #023776; /* 方框的边框 */
@@ -133,12 +172,49 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+   
+    <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入 Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入 html2canvas 库 -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            success: '#00B42A',
+            warning: '#FF7D00',
+            danger: '#F53F3F',
+            neutral: '#86909C',
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .progress-bar {
+        transition: width 0.5s ease;
+      }
+      .margin-auto {
+  margin: 0 auto; /* 水平居中 */
+  display: block; /* 转为块级元素 */
+}
+    }
+  </style>
 </head>
 
 <body>
-    <div class="data-container">
-    <h1>水质数据展示</h1>
-    <div class="data-container">
+    <h2 style="text-align: left;font-size: 30px;" class="title-1">水质数据展示</h2>
+    <button id="downloadBtn0" class="Btn0"><i class="fa fa-download mr-2"></i>点击下载</button>
+    <div class="data-container" id="data-container">
         <!-- 模拟数据展示项，实际应用中需从后端获取数据并动态更新 -->
        <div class="data-item">
         <span class="data-name">水质水平</span>
@@ -183,18 +259,68 @@
             <span class="data-value">{{water_temp}}</span>
         </div>
     </div>
-    </div>
+    <script>
+    // 等待 DOM 加载完成
+    document.addEventListener('DOMContentLoaded', function() {
+      // 下载按钮事件监听
+      document.getElementById('downloadBtn0').addEventListener('click', function() {
+        // 获取要截图的容器（这里使用包含所有数据项的容器）
+        const targetElement = document.getElementById('data-container');
+        console.log('按钮被点击了');
+        // 显示加载状态
+        this.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>正在生成...';
+        this.disabled = true;
+        
+        // 使用 html2canvas 生成图片
+        html2canvas(targetElement, {
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#023776', // 设置背景色为白色
+        }).then(canvas => {
+          // 生成图片 URL
+          const imgURL = canvas.toDataURL('image/png');
+          
+          // 创建下载链接
+          const link = document.createElement('a');
+          link.href = imgURL;
+          link.download = `水质数据展示_${new Date().toISOString().replace(/:/g, '-')}.png`;
+          
+          // 触发下载
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // 恢复按钮状态
+          this.innerHTML = '<i class="fa fa-download mr-2"></i>点击下载';
+          this.disabled = false;
+        }).catch(error => {
+          console.error('截图失败:', error);
+          this.innerHTML = '<i class="fa fa-exclamation-triangle mr-2"></i>下载失败';
+          this.disabled = false;
+          
+          // 3秒后恢复按钮文本
+          setTimeout(() => {
+            this.innerHTML = '<i class="fa fa-download mr-2"></i>点击下载';
+          }, 3000);
+        });
+      });
+    });
+  </script>
+    
     <h2 style="text-align: left;font-size: 30px;" class="title-right">鱼群种类统计</h2>
+    <button id="downloadBtn1" class="Btn1"><i class="fa fa-download mr-2"></i>点击下载</button>
     <div id="chart"></div>
     <script>
         var chartDom = document.getElementById('chart');
         var myChart = echarts.init(chartDom);
         var option;
         option = {
+            maintainAspectRatio: false,
+            responsive: true,
+            
             title: {
-               
                 left: '100%',
-                top: '10%',
+                top: '1%',
                 textStyle: {
                     color: 'white'
                 }
@@ -255,11 +381,57 @@
 
         option && myChart.setOption(option);
     </script>
-    
+    <script>
+    // 等待 DOM 加载完成
+    document.addEventListener('DOMContentLoaded', function() {
+      // 下载按钮事件监听
+      document.getElementById('downloadBtn1').addEventListener('click', function() {
+        // 获取要截图的容器（这里使用包含所有数据项的容器）
+        const targetElement = document.getElementById('chart');
+        console.log('按钮被点击了');
+        // 显示加载状态
+        this.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>正在生成...';
+        this.disabled = true;
+        
+        // 使用 html2canvas 生成图片
+        html2canvas(targetElement, {
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#023776', // 设置背景色为白色
+        }).then(canvas => {
+          // 生成图片 URL
+          const imgURL = canvas.toDataURL('image/png');
+          
+          // 创建下载链接
+          const link = document.createElement('a');
+          link.href = imgURL;
+          link.download = `鱼群种类统计_${new Date().toISOString().replace(/:/g, '-')}.png`;
+          
+          // 触发下载
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // 恢复按钮状态
+          this.innerHTML = '<i class="fa fa-download mr-2"></i>点击下载';
+          this.disabled = false;
+        }).catch(error => {
+          console.error('截图失败:', error);
+          this.innerHTML = '<i class="fa fa-exclamation-triangle mr-2"></i>下载失败';
+          this.disabled = false;
+          
+          // 3秒后恢复按钮文本
+          setTimeout(() => {
+            this.innerHTML = '<i class="fa fa-download mr-2"></i>点击下载';
+          }, 3000);
+        });
+      });
+    });
+  </script>
     <div id="chart1"></div>
     <h2 class="title-left">鱼群重量，尺寸等信息统计</h2>
+    <button id="downloadBtn3" class="Btn3"><i class="fa fa-download mr-2"></i>点击下载</button>
     <div class="selection-container">
-   
     <select id="fishSpecies">
         <option value="Bream">Bream</option>
         <option value="Roach">Roach</option>
@@ -383,6 +555,53 @@
         // 初始加载时绘制图表
         updateChart();
     </script>
+    <script>
+    // 等待 DOM 加载完成
+    document.addEventListener('DOMContentLoaded', function() {
+      // 下载按钮事件监听
+      document.getElementById('downloadBtn3').addEventListener('click', function() {
+        // 获取要截图的容器（这里使用包含所有数据项的容器）
+        const targetElement = document.getElementById('fishChart');
+        console.log('按钮被点击了');
+        // 显示加载状态
+        this.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>正在生成...';
+        this.disabled = true;
+        
+        // 使用 html2canvas 生成图片
+        html2canvas(targetElement, {
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#023776', // 设置背景色为白色
+        }).then(canvas => {
+          // 生成图片 URL
+          const imgURL = canvas.toDataURL('image/png');
+          
+          // 创建下载链接
+          const link = document.createElement('a');
+          link.href = imgURL;
+          link.download = `鱼群重量，尺寸等信息统计_${new Date().toISOString().replace(/:/g, '-')}.png`;
+          
+          // 触发下载
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // 恢复按钮状态
+          this.innerHTML = '<i class="fa fa-download mr-2"></i>点击下载';
+          this.disabled = false;
+        }).catch(error => {
+          console.error('截图失败:', error);
+          this.innerHTML = '<i class="fa fa-exclamation-triangle mr-2"></i>下载失败';
+          this.disabled = false;
+          
+          // 3秒后恢复按钮文本
+          setTimeout(() => {
+            this.innerHTML = '<i class="fa fa-download mr-2"></i>点击下载';
+          }, 3000);
+        });
+      });
+    });
+  </script>
     <div class="white-box">
         
     </div>
