@@ -549,6 +549,74 @@ def datas():
     conn.close()
     return render_template('datas.html', data=data)
 
+from flask import jsonify
+@app.route('/alerts')
+def alerts():
+    if 'user_id' not in session or session.get('role') != 1:
+        return jsonify([])
+
+    user_id = session['user_id']
+    today = date.today()
+
+    conn = pymysql.connect(**db_config)
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("SELECT * FROM fish_farms WHERE farmer_id = %s", (user_id,))
+    farms = cursor.fetchall()
+
+    def check_exceed(key, value):
+        try:
+            value = float(value)
+            if key == 'water_temp':
+                return not (10 <= value <= 30)
+            elif key == 'ph':
+                return not (6.5 <= value <= 8.5)
+            elif key == 'dissolved_oxygen':
+                return value < 5
+            elif key == 'conductivity':
+                return value > 1500
+            elif key == 'turbidity':
+                return value > 5
+            elif key == 'cod_mn':
+                return value > 6
+            elif key == 'ammonia_nitrogen':
+                return value > 1.5
+            elif key == 'total_phosphorus':
+                return value > 0.2
+            elif key == 'total_nitrogen':
+                return value > 2.0
+            elif key == 'chlorophyll_a':
+                return value > 15
+            elif key == 'algae_density':
+                return value > 10000
+        except:
+            return False
+        return False
+
+    alerts = []
+    for farm in farms:
+        cursor.execute("""
+            SELECT * FROM water_quality_data 
+            WHERE farm_id = %s  
+            ORDER BY monitor_time DESC 
+            LIMIT 1
+        """, (farm['farm_id'],))
+        row = cursor.fetchone()
+        if row and row.get('site_status') == '正常':
+            for key, value in row.items():
+                if key in ['water_temp', 'ph', 'dissolved_oxygen', 'conductivity',
+                           'turbidity', 'cod_mn', 'ammonia_nitrogen',
+                           'total_phosphorus', 'total_nitrogen', 'chlorophyll_a', 'algae_density']:
+                    if check_exceed(key, value):
+                        alerts.append({
+                            'section_name': farm['section_name'],
+                            'param': key,
+                            'value': value
+                        })
+
+    conn.close()
+    return jsonify(alerts)
+
 
 # 智能中心
 @app.route('/AI_center')
