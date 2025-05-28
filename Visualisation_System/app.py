@@ -12,7 +12,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'yuxin173',
+    'password': '123456',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -487,7 +487,6 @@ def datas():
     def check_exceed(key, value):
         try:
             value = float(value)
-            # 标准逻辑（简化处理）
             if key == 'water_temp':
                 return not (10 <= value <= 30)
             elif key == 'ph':
