@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from fish_price_spider import get_today_fish_prices
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -12,7 +13,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'yuxin173',
+    'password': 'Root12345!',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -448,7 +449,11 @@ def get_coordinates(province):
     }
     return province_coords.get(province, (0, 0))
 
-
+# 今日鱼群价格
+@app.route("/fish_price_today")
+def fish_price_today():
+    fish_data = get_today_fish_prices()
+    return render_template("fish_price_today.html", data=fish_data)
 
 # 数据中心（由警报改）
 from datetime import date

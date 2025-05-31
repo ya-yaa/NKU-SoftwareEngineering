@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>今日淡水鱼价格信息</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-top: 60px;
+        }
+
+        .title-section h2 {
+            text-align: center;
+            font-size: 2.8em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            margin: 40px auto;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .page-link-style {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .page-link-style:hover {
+            text-decoration: none;
+        }
+
+        .btn-wrapper {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 独立标题 -->
+    <div class="title-section">
+        <h2>今日淡水鱼价格信息</h2>
+    </div>
+
+    <!-- 表格区域容器 -->
+    <div class="container">
+        <table id="fishTable" class="table table-bordered table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>品名</th><th>最低价</th><th>平均价</th><th>最高价</th>
+                    <th>规格</th><th>单位</th><th>发布日期</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                {% for item in data %}
+                <tr>
+                    <td>{{ item.品名 }}</td>
+                    <td>{{ item.最低价 }}</td>
+                    <td>{{ item.平均价 }}</td>
+                    <td>{{ item.最高价 }}</td>
+                    <td>{{ item.规格 }}</td>
+                    <td>{{ item.单位 }}</td>
+                    <td>{{ item.发布日期 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- 分页控件 -->
+        <div class="text-center mt-4">
+            <a href="javascript:void(0);" id="prevBtn" class="page-link-style mx-2">上一页</a>
+            <span id="pageInfo" class="mx-2"></span>
+            <a href="javascript:void(0);" id="nextBtn" class="page-link-style mx-2">下一页</a>
+        </div>
+    </div>
+
+    <!-- 独立的返回主页按钮 -->
+    <div class="btn-wrapper">
+        <a href="{{ url_for('home') }}" class="btn btn-primary">返回主页</a>
+    </div>
+
+    <script>
+        const rowsPerPage = 10;
+        const table = document.getElementById("fishTable");
+        const tbody = document.getElementById("tableBody");
+        const rows = tbody.getElementsByTagName("tr");
+        const pageInfo = document.getElementById("pageInfo");
+        let currentPage = 1;
+
+        function showPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].style.display = (i >= start && i < end) ? "" : "none";
+            }
+            pageInfo.textContent = `第 ${page} 页 / 共 ${Math.ceil(rows.length / rowsPerPage)} 页`;
+        }
+
+        document.getElementById("prevBtn").onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        };
+
+        document.getElementById("nextBtn").onclick = () => {
+            if (currentPage < Math.ceil(rows.length / rowsPerPage)) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        };
+
+        showPage(currentPage);
+    </script>
+</body>
+</html>
