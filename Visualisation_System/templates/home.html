@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
     body {
         background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
@@ -8,6 +9,51 @@
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
+
+    .alert-box {
+        position: fixed;
+        top: 50px;
+        right: 5%;
+        width: 23%;
+        max-height: 180px;
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .alert-entry {
+        background-color: #ffe6e6;
+        padding: 2px 4px;
+        margin-bottom: 5px;
+        border-left: 3px solid red; /* 改小原来的 5px */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .alert-entry span {
+        flex: 1;
+        font-size: 14px;
+    }
+
+    .alert-entry button {
+        background: none;
+        border: none;
+        color: #a00;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .alert-box strong {
+        color: red;
+        display: block;
+        margin-bottom: 8px; 
+    }
+
     .fish-link {
         display: block;
         text-align: center;
@@ -18,6 +64,7 @@
         font-size: 1.2em;
         font-weight: 500;
     }
+  
     .fish-link:hover {
         color: #f9ea95; /* 鼠标悬停变亮一点 */
     }
@@ -56,6 +103,12 @@
             </div>
         </div>
     </section>
+    {% if role == 1 %}
+    <div class="alert-box" id="alertBox" style="display: none;">
+        <strong>⚠ 异常警报：</strong>
+        <div id="alertList"></div>
+    </div>
+    {% endif %}
 
     <a href="{{ url_for('fish_price_today') }}" class="fish-link">看看今天鱼鱼价格！！</a>
 
@@ -130,4 +183,42 @@
         <a class="btn" href="{{ url_for('logout') }}">退出登录</a>
     </footer>
 </body>
+
+<script>
+$(document).ready(function() {
+    $.getJSON('{{ url_for("alerts") }}', function(data) {
+        if (data.length > 0) {
+            $('#alertBox').show();
+            data.forEach(function(alert, index) {
+                const alertHTML = `
+                    <div class="alert-entry" id="alert-${index}">
+                        <span>${alert.section_name} ${formatParam(alert.param)} 异常！当前值为 ${alert.value}</span>
+                        <button onclick="$('#alert-${index}').remove()">×</button>
+                    </div>
+                `;
+                $('#alertList').append(alertHTML);
+            });
+        }
+    });
+
+    function formatParam(param) {
+        const map = {
+            water_temp: "水温",
+            ph: "pH",
+            dissolved_oxygen: "溶解氧",
+            conductivity: "电导率",
+            turbidity: "浊度",
+            cod_mn: "高锰酸盐指数",
+            ammonia_nitrogen: "氨氮",
+            total_phosphorus: "总磷",
+            total_nitrogen: "总氮",
+            chlorophyll_a: "叶绿素a",
+            algae_density: "藻密度"
+        };
+        return map[param] || param;
+    }
+});
+</script>
+
+
 </html>
