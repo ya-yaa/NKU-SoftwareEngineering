@@ -23,6 +23,7 @@
         padding: 10px;
         z-index: 1000;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        cursor: move;
     }
 
     .alert-entry {
@@ -105,7 +106,12 @@
     </section>
     {% if role == 1 %}
     <div class="alert-box" id="alertBox" style="display: none;">
-        <strong>⚠ 异常警报：</strong>
+        <div style="display: flex; justify-content: space-between; align-items: center; ">
+            <strong style="color: red;">⚠ 异常警报：</strong>
+            <button id="toggleAlertList" style="font-size: 14px; background: none; border: none; cursor: pointer; color: #a00;">
+                收起
+            </button>
+        </div>
         <div id="alertList"></div>
     </div>
     {% endif %}
@@ -200,6 +206,17 @@ $(document).ready(function() {
             });
         }
     });
+    $('#toggleAlertList').on('click', function () {
+        const alertList = $('#alertList');
+        const isVisible = alertList.is(':visible');
+        if (isVisible) {
+            alertList.slideUp(); // 收起
+            $(this).text('展开');
+        } else {
+            alertList.slideDown(); // 展开
+            $(this).text('收起');
+        }
+    });
 
     function formatParam(param) {
         const map = {
@@ -218,6 +235,33 @@ $(document).ready(function() {
         return map[param] || param;
     }
 });
+
+
+  const alertBox = document.querySelector('.alert-box');
+
+  let isDragging = false;
+  let offsetX, offsetY;
+
+  alertBox.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    // 获取鼠标点击位置相对于元素左上角的偏移
+    offsetX = e.clientX - alertBox.getBoundingClientRect().left;
+    offsetY = e.clientY - alertBox.getBoundingClientRect().top;
+    document.body.style.userSelect = 'none'; // 防止选中文本
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (isDragging) {
+      alertBox.style.left = (e.clientX - offsetX) + 'px';
+      alertBox.style.top = (e.clientY - offsetY) + 'px';
+      alertBox.style.right = 'auto'; // 清除 right 限制
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    isDragging = false;
+    document.body.style.userSelect = ''; // 恢复文本选择
+  });
 </script>
 
 
