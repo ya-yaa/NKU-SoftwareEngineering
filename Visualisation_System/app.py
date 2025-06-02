@@ -12,6 +12,7 @@ from pymysql import connect
 from mysql.connector import connect
 from flask import send_file
 from io import BytesIO
+import datetime
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
 
@@ -308,7 +309,7 @@ def export_fishes():
     file_format = request.args.get('format', 'csv').lower()
     if file_format not in ['csv', 'xls', 'xlsx']:
         flash("不支持的文件格式", "error")
-        return redirect(url_for('upload_fishes'))  # 假设这是你的管理页面
+        return redirect(url_for('upload_fishes')) 
 
     try:
         # 连接数据库
@@ -339,6 +340,65 @@ def export_fishes():
             df.to_excel(output, index=False, engine='openpyxl')
             content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             filename = f"fishes_{datetime.now().strftime('%Y%m%d')}.xlsx"
+
+        # 构造响应
+        output.seek(0)
+        return send_file(
+            output,
+            mimetype=content_type,
+            as_attachment=True,
+            download_name=filename
+        )
+
+    except Exception as e:
+        print("导出失败，错误详情：", str(e))  # 关键调试信息
+        flash(f"导出失败: {str(e)}", "error")
+        return redirect(url_for('fish_farms'))
+    
+@app.route('/admin/export_fish_farms', methods=['GET'])
+def export_fish_farms():
+    if session.get('role') != 0:
+        flash("无权限", "error")
+        return redirect(url_for('home'))
+
+    # 获取用户请求的格式，默认是 csv
+    file_format = request.args.get('format', 'csv').lower()  # 修改为使用 GET 参数
+    if file_format not in ['csv', 'xlsx']:
+        flash("不支持的文件格式", "error")
+        return redirect(url_for('water_quality_data')) 
+
+    try:
+        # 连接数据库
+        conn = connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+
+        # 查询所有渔场的数据
+        query = """
+            SELECT id, province, river_basin, section_name, monitor_time, quality_level,
+                   water_temp, ph, dissolved_oxygen, conductivity, turbidity, cod_mn,
+                   ammonia_nitrogen, total_phosphorus, total_nitrogen, chlorophyll_a,
+                   algae_density, site_status, farm_id, source_date 
+            FROM water_quality_data
+        """
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+        conn.close()
+
+        # 将数据转为 pandas DataFrame
+        df = pd.DataFrame(data)
+
+        # 设置响应头以触发浏览器下载
+        output = BytesIO()
+
+        if file_format == 'csv':
+            df.to_csv(output, index=False, encoding='utf-8-sig')
+            content_type = 'text/csv'
+            filename = f"water_quality_data_{datetime.datetime.now().strftime('%Y%m%d')}.csv"
+        elif file_format == 'xlsx':
+            df.to_excel(output, index=False, engine='openpyxl')
+            content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            filename = f"water_quality_data_{datetime.datetime.now().strftime('%Y%m%d')}.xlsx"
 
         # 构造响应
         output.seek(0)

@@ -184,13 +184,18 @@ body {
                 <button class="button">导出鱼类数据 ▼</button>
                 <div class="dropdown-content">
                     <a href="{{ url_for('export_fishes', format='csv') }}">CSV (.csv)</a>
-                    <!-- <a href="{{ url_for('export_fishes', format='xls') }}">Excel 97-2003 (.xls)</a> -->
                     <a href="{{ url_for('export_fishes', format='xlsx') }}">Excel (.xlsx)</a>
                 </div>
             </div>
         {% endif %}
         {% if session.get('role') == 0 %}
-            <a href="{{ url_for('upload_fishes') }}" class="button">导出渔场数据</a>
+            <div class="dropdown">
+                <button class="button">导出渔场数据 ▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('export_fish_farms', format='csv') }}">CSV (.csv)</a>
+                    <a href="{{ url_for('export_fish_farms', format='xlsx') }}">Excel (.xlsx)</a>
+                </div>
+            </div>
         {% endif %}
         <a href="{{ url_for('home') }}">返回首页</a>
     </div>
