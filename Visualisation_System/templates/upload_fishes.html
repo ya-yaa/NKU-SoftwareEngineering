@@ -112,8 +112,8 @@
 
     <!-- 文件上传表单 -->
     <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload_fishes') }}">
-        <p>请上传 .xls 或 .xlsx 格式的 Excel 文件</p>
-        <input type="file" name="file" accept=".xls,.xlsx">
+        <p>请上传 .xls .xlsx或.csv 格式的 Excel 文件</p>
+        <input type="file" name="file" accept=".xls,.xlsx, .csv">
         <button type="submit">上传</button>
     </form>
 

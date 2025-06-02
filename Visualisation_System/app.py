@@ -9,6 +9,9 @@ import os
 import pandas as pd
 from flask import flash, redirect, url_for, request, session
 from pymysql import connect
+from mysql.connector import connect
+from flask import send_file
+from io import BytesIO
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
 
@@ -249,6 +252,8 @@ def upload_fishes():
                 df = pd.read_excel(file, engine='xlrd')
             elif file.filename.endswith('.xlsx'):
                 df = pd.read_excel(file, engine='openpyxl')
+            elif file.filename.endswith('.csv'):
+                df = pd.read_csv(file)
             else:
                 raise ValueError("Unsupported file format")
 
@@ -292,6 +297,62 @@ def upload_fishes():
         return redirect(url_for('upload_fishes'))
 
     return render_template('upload_fishes.html')
+
+@app.route('/admin/export_fishes', methods=['GET'])
+def export_fishes():
+    if session.get('role') != 0:
+        flash("无权限", "error")
+        return redirect(url_for('home'))
+
+    # 获取用户请求的格式，默认是 csv
+    file_format = request.args.get('format', 'csv').lower()
+    if file_format not in ['csv', 'xls', 'xlsx']:
+        flash("不支持的文件格式", "error")
+        return redirect(url_for('upload_fishes'))  # 假设这是你的管理页面
+
+    try:
+        # 连接数据库
+        conn = connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+
+        # 查询所有鱼类数据
+        cursor.execute("SELECT fish_id, species, length1, length2, length3, height, date, weight, width FROM fishes")
+        data = cursor.fetchall()
+
+        conn.close()
+
+        # 将数据转为 pandas DataFrame
+        df = pd.DataFrame(data)
+
+        # 设置响应头以触发浏览器下载
+        output = BytesIO()
+
+        if file_format == 'csv':
+            df.to_csv(output, index=False, encoding='utf-8-sig')
+            content_type = 'text/csv'
+            filename = f"fishes_{datetime.now().strftime('%Y%m%d')}.csv"
+        # elif file_format == 'xls':
+        #     df.to_excel(output, index=False, engine='xlwt')
+        #     content_type = 'application/vnd.ms-excel'
+        #     filename = f"fishes_{datetime.now().strftime('%Y%m%d')}.xls"
+        elif file_format == 'xlsx':
+            df.to_excel(output, index=False, engine='openpyxl')
+            content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            filename = f"fishes_{datetime.now().strftime('%Y%m%d')}.xlsx"
+
+        # 构造响应
+        output.seek(0)
+        return send_file(
+            output,
+            mimetype=content_type,
+            as_attachment=True,
+            download_name=filename
+        )
+
+    except Exception as e:
+        print("导出失败，错误详情：", str(e))  # 关键调试信息
+        flash(f"导出失败: {str(e)}", "error")
+        return redirect(url_for('fish_farms'))
 
 # 渔场列表与搜索页面
 @app.route('/fish_farms', methods=['GET'])
