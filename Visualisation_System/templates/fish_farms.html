@@ -140,6 +140,9 @@ body {
     <div class="actions">
         
         <a href="{{ url_for('home') }}">返回首页</a>
+        {% if session.get('role') == 0 %}
+            <a href="{{ url_for('upload_fishes') }}" class="button">上传鱼类数据</a>
+        {% endif %}
     </div>
 
     {% if fish_farms %}
