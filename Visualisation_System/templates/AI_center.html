@@ -30,18 +30,34 @@
             margin-bottom: 40px;
         }
 
-        .card-grid {
+
+
+        .card-grid.two-columns {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-around;
+            justify-content: space-between;
             gap: 20px;
+        }
+
+        .card-grid.two-columns .card {
+            flex: 1 1 calc(50% - 10px); /* 考虑 gap 后每张卡片占据一半 */
+            max-width: calc(50% - 10px);
+            box-sizing: border-box;
+        }
+
+        .card.full-width {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .card {
             background-color: #f9fbfc;
             border-radius: 10px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            
             padding: 25px;
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -209,52 +225,69 @@
 <div class="container">
     <h1>🤖 欢迎来到智能中心！🤖</h1>
 
-    <div class="card-grid">
+    <div class="card-grid two-columns">
 
         <!-- 图片识别卡片 -->
        <div class="card">
-        <h2>图片识别</h2>
-        <p>上传鱼类图片，自动识别种类，实现渔业智能识别分析。</p>
+            <h2>图片识别</h2>
+            <p>上传鱼类图片，自动识别种类，实现渔业智能识别分析。</p>
 
-        <form class="upload-form" method="post" action="{{ url_for('image_recognition') }}" enctype="multipart/form-data">
-            <label class="custom-file-upload">
-                <input type="file" name="image" accept="image/*" required>
-                选择图片
-            </label>
-            <br><br>
-            <button type="submit" class="card-button">上传识别</button>
-        </form>
-
-        {% if img_data %}
-         <div style="margin-bottom: 10px;">
-            <strong>上传图片：</strong><br>
-            <img src="data:image/jpeg;base64,{{ img_data }}" alt="Uploaded Image" style="max-width: 100%; border-radius: 8px; margin-top: 10px;">
-        </div>
-        {% endif %}
-        
-        
-
-        {% if result %}
-        <div class="result-box">
-            <strong>识别结果：</strong>
-            <p>{{ result }}</p>
-
-            <!-- 养殖建议按钮表单 -->
-            <form method="post" action="{{ url_for('image_recognition') }}">
-                <input type="hidden" name="fish_type" value="{{ result }}">
-                <input type="hidden" name="img_data" value="{{ img_data }}">
-                <input type="submit" value="查看养殖建议" class="suggest-button">
+            <form class="upload-form" method="post" action="{{ url_for('AI_center') }}" enctype="multipart/form-data">
+                <input type="hidden" name="form_type" value="image_recognition"> <!-- 新增 -->
+                <label class="custom-file-upload">
+                    <input type="file" name="image" accept="image/*" required>
+                    选择图片
+                </label>
+                <br><br>
+                <button type="submit" class="card-button">上传识别</button>
             </form>
-        </div>
-        {% endif %}
 
-        {% if suggestion %}
-        <div class="suggest-box">
-            <strong>🐟 {{ fish_type }} 的养殖建议：</strong>
-            <p>{{ suggestion }}</p>
+
+            {% if img_data and img_data|length > 0 %}
+                <div style="margin-bottom: 10px;">
+                    <strong>上传图片：</strong><br>
+                    <img src="data:image/jpeg;base64,{{ img_data }}" alt="Uploaded Image"
+                        style="max-width: 100%; border-radius: 8px; margin-top: 10px;">
+                </div>
+
+                {% if result %}
+                <div class="result-box">
+                    <strong>识别结果：</strong>
+                    <p>{{ result }}</p>
+
+                    <!-- 识别后才显示建议按钮 -->
+                    <form method="post" action="{{ url_for('AI_center') }}">
+                        <input type="hidden" name="form_type" value="fish_suggestion">
+                        <input type="hidden" name="fish_type" value="{{ result }}">
+                        <input type="hidden" name="img_data" value="{{ img_data }}">
+
+                        {% if selected_species %}
+                        <input type="hidden" name="selected_species" value="{{ selected_species }}">
+                        {% endif %}
+
+                        {% if plot_img %}
+                        <input type="hidden" name="plot_img" value="{{ plot_img }}">
+                        {% endif %}
+
+                        {% if predictions %}
+                            {% for p in predictions %}
+                                <input type="hidden" name="predictions" value="{{ p }}">
+                            {% endfor %}
+                        {% endif %}
+
+                        <input type="submit" value="查看养殖建议" class="suggest-button">
+                    </form>
+                </div>
+                {% endif %}
+
+                {% if suggestion %}
+                <div class="suggest-box">
+                    <strong>🐟 {{ fish_type }} 的养殖建议：</strong>
+                    <p>{{ suggestion }}</p>
+                </div>
+                {% endif %}
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
 
 
 
@@ -263,17 +296,62 @@
         <!-- 鱼类体长预测卡片 -->
         <div class="card">
             <h2>鱼类体长预测</h2>
-            <p>输入鱼类图像或参数，预测鱼体长度，辅助养殖决策。</p>
-            <a href="{{ url_for('fish_length_prediction') }}">进入功能</a>
+            <p>选择鱼种，查看最近趋势并预测未来三天体长变化。</p>
+
+            <form method="post" action="{{ url_for('AI_center') }}">
+                <input type="hidden" name="form_type" value="length_prediction"> <!-- 新增 -->
+                <!-- 保留图片识别模块数据 -->
+                <input type="hidden" name="img_data" value="{{ img_data }}">
+                <input type="hidden" name="result" value="{{ result }}">
+                <select name="species" required style="padding: 6px; border-radius: 6px; margin-bottom: 10px;">
+                    <option value="">请选择鱼类</option>
+                    {% for s in species_list %}
+                        <option value="{{ s }}" {% if s == selected_species %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select><br>
+                <button type="submit" class="card-button">开始预测</button>
+            </form>
+            {% if error_msg %}
+            <div class="result-box" style="border-left-color: red; color: red;">
+                {{ error_msg }}
+            </div>
+            {% endif %}
+
+            {% if predictions %}
+                {% if plot_img %}
+                <div class="preview-container">
+                    <strong>预测图像：</strong>
+                    <img class="preview-image" src="data:image/png;base64,{{ plot_img }}" alt="预测图像">
+                </div>
+                {% endif %}
+
+                <div class="suggest-box">
+                    <strong>📈 未来三天预测体长：</strong>
+                    <ul>
+                        {% for p in predictions %}
+                            <li>{{ "%.2f"|format(p) }} cm</li>
+                        {% endfor %}
+                    </ul>
+                     <button class="suggest-button" onclick="document.getElementById('length-suggestion-box').style.display='block'">查看养殖建议</button>
+                </div>
+
+               {% if length_suggestion %}
+                <div id="length-suggestion-box" class="suggest-box" style="display: none;">
+                    <strong>📈 体长养殖建议（{{ selected_species }}）</strong>
+                    <p>{{ length_suggestion }}</p>
+                </div>
+                {% endif %}
+
+            {% endif %}
         </div>
 
-        <!-- 智能问答卡片 -->
-        <div class="card">
-            <h2>智能问答</h2>
-            <p>基于AI模型，为你解答渔业问题，快速获取实用知识。</p>
-            <a href="{{ url_for('ai_qa') }}">进入功能</a>
-        </div>
 
+    </div>
+    <!-- 智能问答卡片，单独占一行 -->
+    <div class="card full-width">
+        <h2>智能问答</h2>
+        <p>基于AI模型，为你解答渔业问题，快速获取实用知识。</p>
+        <a href="{{ url_for('ai_qa') }}">进入功能</a>
     </div>
 
     <a href="{{ url_for('home') }}" class="back-button">返回首页</a>

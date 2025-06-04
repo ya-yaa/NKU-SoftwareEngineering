@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, render_template_stringP
+from flask import Flask, render_template, request, redirect, url_for, session, flash, render_template_string
+from matplotlib import pyplot as plt
 from fish_price_spider import get_today_fish_prices
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -9,12 +10,13 @@ import os
 import base64
 from zhipuai import ZhipuAI
 import pandas as pd
+import numpy as np
 from flask import flash, redirect, url_for, request, session
 from pymysql import connect
 from mysql.connector import connect
 from flask import send_file
 from io import BytesIO
-import datetime
+from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
 
@@ -22,7 +24,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '040702',
+    'password': '123456',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -820,29 +822,46 @@ def alerts():
 
 
 # 智能中心
-@app.route('/AI_center')
+@app.route('/AI_center', methods=['GET', 'POST'])
 def AI_center():
-    if 'username' not in session:
-        flash("请先登录。")
-        return redirect(url_for('login'))
-    return render_template('AI_center.html')
-
-# 图片识别
-@app.route('/AI_center/image_recognition', methods=['GET', 'POST'])
-def image_recognition():
     result = None
     img_data = None
     fish_type = None
     suggestion = None
+    selected_species = None
+    predictions = None
+    encoded_plot = None
+    error_msg = None
+    length_suggestion = None
+
+
+    # 1. 获取鱼类种类列表
+    try:
+        connection = pymysql.connect(
+            host='localhost',
+            user='root',
+            password='123456',
+            database='visualsystem',
+            
+        )
+        cursor = connection.cursor()
+        cursor.execute("SELECT DISTINCT species FROM fishes")
+        species_list = [row[0] for row in cursor.fetchall()]
+        connection.close()
+    except Exception as e:
+        species_list = []
+        error_msg = f"数据库连接失败：{str(e)}"
 
     if request.method == 'POST':
-        if 'image' in request.files:
-            file = request.files['image']
-            if file:
+        form_type = request.form.get('form_type')
+
+        # 2. 图片识别模块
+        if form_type == 'image_recognition':
+            file = request.files.get('image')
+            if file and file.filename != '':
                 img_bytes = file.read()
                 img_data = base64.b64encode(img_bytes).decode('utf-8')
 
-                # 图像识别获取鱼的名称
                 response = client.chat.completions.create(
                     model="glm-4v-plus-0111",
                     messages=[
@@ -858,14 +877,16 @@ def image_recognition():
                 result = response.choices[0].message.content.strip()
                 fish_type = result
 
-        elif 'fish_type' in request.form:
-            fish_type = request.form['fish_type']
-            result = fish_type  # 确保识别结果仍然显示
-
-            # 如果用户提交了 base64 图片数据，也保留显示
+        # 3. 查看养殖建议
+        elif form_type == 'fish_suggestion':
+            fish_type = request.form.get('fish_type')
+            result = fish_type
             img_data = request.form.get('img_data')
+            selected_species = request.form.get('selected_species')
+            encoded_plot = request.form.get('plot_img')
+            predictions = request.form.getlist('predictions')
+            predictions = [float(p) for p in predictions] if predictions else None
 
-            # 生成养殖建议
             response = client.chat.completions.create(
                 model="glm-4-plus",
                 messages=[
@@ -875,23 +896,145 @@ def image_recognition():
             )
             suggestion = response.choices[0].message.content.strip()
 
+        # 4. 体长预测模块
+        elif form_type == 'length_prediction':
+            selected_species = request.form.get('species')
+            img_data = request.form.get('img_data')
+            result = request.form.get('result')
+            fish_type = result
+            suggestion = request.form.get('suggestion')
+            predictions = []
+
+            if not selected_species:
+                error_msg = "请选择一个鱼类种类。"
+            else:
+                try:
+                    connection = pymysql.connect(
+                        host='localhost',
+                        user='root',
+                        password='123456',
+                        database='visualsystem'
+                    )
+                    cursor = connection.cursor()
+                    cursor.execute(
+                        "SELECT date, length2 FROM fishes WHERE species = %s ORDER BY date ASC",
+                        (selected_species,)
+                    )
+                    data = cursor.fetchall()
+                    connection.close()
+
+                    if not data:
+                        error_msg = f"未找到 '{selected_species}' 的历史记录。"
+                    else:
+                        dates = [int(row[0]) for row in data]
+                        lengths = [float(row[1]) for row in data]
+
+                        # 🔮 向大模型请求预测未来3天体长
+                        input_series = ", ".join([f"{v:.2f}" for v in lengths])
+                        prompt = (
+                            f"给定以下鱼类 {selected_species} 的历史体长数据（单位：cm）：\n"
+                            f"{input_series}\n"
+                            f"请根据趋势预测接下来3天的体长数值，仅返回3个数字，单位为cm，不要其他描述。"
+                        )
+
+                        response = client.chat.completions.create(
+                            model="glm-4-plus",
+                            messages=[
+                                {"role": "user", "content": prompt}
+                            ]
+                        )
+
+                        # 🧠 提取返回预测值
+                        pred_text = response.choices[0].message.content.strip()
+                        predictions = [float(p.strip()) for p in pred_text.replace('\n', ',').split(',') if p.strip()]
+
+                        # 📈 绘图：历史 + 预测
+                        x = np.arange(1, len(lengths) + 1)
+                        y = np.array(lengths)
+                        future_x = np.arange(len(lengths) + 1, len(lengths) + 1 + len(predictions))
+
+                        plt.figure(figsize=(8, 4))
+                        plt.plot(x, y, 'bo-', label='历史体长')
+                        plt.plot(future_x, predictions, 'ro--', label='预测体长')
+                        plt.xlabel('日期序号')
+                        plt.ylabel('体长 (cm)')
+                        plt.title(f'{selected_species} 的体长预测')
+                        plt.legend()
+                        plt.tight_layout()
+
+                        img_io = BytesIO()
+                        plt.savefig(img_io, format='png')
+                        img_io.seek(0)
+                        encoded_plot = base64.b64encode(img_io.read()).decode('utf-8')
+                        plt.close()
+
+                except Exception as e:
+                    error_msg = f"查询或预测失败：{str(e)}"
+
+            # 🔁 若无养殖建议则补全
+            if not suggestion and result:
+                response = client.chat.completions.create(
+                    model="glm-4-plus",
+                    messages=[
+                        {"role": "system", "content": "你是一个乐于回答各种问题的小助手，你的任务是提供专业、准确、有洞察力的建议。"},
+                        {"role": "user", "content": f"请用一段话提供关于{result}的养殖建议。"}
+                    ]
+                )
+                suggestion = response.choices[0].message.content.strip()
+            if selected_species and predictions:
+                prediction_str = ', '.join(f"{p:.2f}" for p in predictions)
+                prompt = (
+                    f"我正在养殖{selected_species}，最近的体长预测为：{prediction_str} cm。\n"
+                    f"请结合这一趋势，给出一些养殖建议，如是否需要调整投喂、注意生长速度或环境控制等。"
+                )
+                response = client.chat.completions.create(
+                    model="glm-4-plus",
+                    messages=[
+                        {"role": "system", "content": "你是一位专业的水产养殖顾问，善于结合数据做出精准建议,只要给出一段话即可。"},
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                length_suggestion = response.choices[0].message.content.strip()
     return render_template(
         'AI_center.html',
         result=result,
         img_data=img_data,
         fish_type=fish_type,
-        suggestion=suggestion
+        suggestion=suggestion or [],
+        species_list=species_list,
+        selected_species=selected_species,
+        predictions=predictions or [],
+        plot_img=encoded_plot,
+        error_msg=error_msg,
+        length_suggestion=length_suggestion
     )
 
-# 鱼类体长预测
-@app.route('/AI_center/fish_length_prediction')
-def fish_length_prediction():
-    return "<h2>鱼类体长预测模块（待实现）</h2>"
-
 # 智能问答
-@app.route('/AI_center/ai_qa')
+@app.route('/AI_center/ai_qa', methods=['GET'])
 def ai_qa():
-    return "<h2>智能问答模块（待实现）</h2>"
+    return render_template('ai_qa.html')  # 渲染前端 HTML 页面
+
+@app.route('/AI_center/ask', methods=['POST'])
+def ask_question():
+    data = request.get_json()
+    user_question = data.get("question")
+
+    if not user_question:
+        return jsonify({"error": "问题不能为空"}), 400
+
+    try:
+        response = client.chat.completions.create(
+            model="glm-4-plus",
+            messages=[
+                {"role": "system", "content": "你是一位乐于回答各种问题的小助手，擅长水产养殖相关知识，回答要简洁、专业、有洞察力。"},
+                {"role": "user", "content": user_question}
+            ]
+        )
+        answer = response.choices[0].message.content.strip()
+        return jsonify({"answer": answer})
+
+    except Exception as e:
+        return jsonify({"error": f"生成回答失败：{str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
