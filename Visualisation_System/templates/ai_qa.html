@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<title>智能问答 - 对话形式</title>
+<style>
+  /* Reset */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    color: #222;
+  }
+  .container {
+    max-width: 600px;
+    margin: auto;
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+  }
+ header {
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  background: white;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+#backBtn {
+  background: transparent;
+  border: none;
+  color: #007acc;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+#backBtn:hover {
+  background: rgba(0, 122, 204, 0.1);
+}
+
+header h1 {
+  font-size: 1.5rem;
+  color: #007acc;
+  margin: 0;
+  font-weight: 700;
+}
+
+  #chatBox {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: #f9fbfc;
+  }
+  .message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    line-height: 1.4;
+    font-size: 1rem;
+    white-space: pre-wrap;
+  }
+  .userMsg {
+    background: #007acc;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .botMsg {
+    background: #e4e7eb;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  footer {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    gap: 10px;
+    background: white;
+    border-top: 1px solid #ddd;
+    }
+
+    .input-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    }
+
+    #suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+    }
+
+    .suggestion {
+    background: #eef6fb;
+    color: #007acc;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.3s ease;
+    }
+
+    .suggestion:hover {
+    background: #d0e9f9;
+    }
+
+    #questionInput {
+    font-size: 1rem;
+    padding: 10px 14px;
+    border: 2px solid #007acc;
+    border-radius: 25px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    width: 100%;
+    }
+
+    #sendBtn {
+    background: #007acc;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0 20px;
+    height: 45px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    }
+
+    #sendBtn:hover:not(:disabled) {
+    background: #005fa3;
+    }
+
+    #sendBtn:disabled {
+    background: #a0c6f7;
+    cursor: not-allowed;
+    }
+  #suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 20px 0;
+}
+
+.suggestion {
+  background: #eef6fb;
+  color: #007acc;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.suggestion:hover {
+  background: #d0e9f9;
+}
+
+#backArea {
+  padding: 15px 20px 0;
+}
+
+#backBtn {
+  background: transparent;
+  border: none;
+  color: #007acc;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+#backBtn:hover {
+  background: rgba(0, 122, 204, 0.1);
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+<header>
+  <div class="header-row">
+    <button id="backBtn" title="返回上一页"><-</button>
+    <h1>智能问答</h1>
+  </div>
+</header>
+  <div id="chatBox" aria-live="polite" aria-label="聊天记录">
+    <!-- 对话消息展示区 -->
+  </div>
+  <footer>
+    <div class="input-area">
+        <div id="suggestions" aria-label="推荐问题">
+        <span class="suggestion">今天的天气怎么样？</span>
+        <span class="suggestion">如何养殖草鱼？</span>
+        <span class="suggestion">请预测未来三天的体长变化</span>
+        <span class="suggestion">鱼塘水质检测指标有哪些？</span>
+        </div>
+        <input type="text" id="questionInput" placeholder="请输入你的问题..." aria-label="输入你的问题" />
+    </div>
+    <button id="sendBtn" disabled>发送</button>
+    </footer>
+</div>
+
+<script>
+  const chatBox = document.getElementById('chatBox');
+  const questionInput = document.getElementById('questionInput');
+  const sendBtn = document.getElementById('sendBtn');
+
+  // 根据输入框内容启用/禁用发送按钮
+  questionInput.addEventListener('input', () => {
+    sendBtn.disabled = questionInput.value.trim().length === 0;
+  });
+
+  // 发送消息并获取AI回复
+  async function sendQuestion() {
+    const question = questionInput.value.trim();
+    if (!question) return;
+    
+    appendMessage('user', question);
+    questionInput.value = '';
+    sendBtn.disabled = true;
+    appendMessage('bot', '正在生成回答，请稍候...');
+    
+    // 滚动到底部
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+      const response = await fetch('/AI_center/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await response.json();
+
+      // 删除“正在生成回答”提示
+      removeLastBotMessage();
+      
+      if (data.answer) {
+        appendMessage('bot', data.answer);
+      } else if (data.error) {
+        appendMessage('bot', '错误：' + data.error);
+      } else {
+        appendMessage('bot', '抱歉，未能获取到回答。');
+      }
+    } catch (err) {
+      removeLastBotMessage();
+      appendMessage('bot', '请求失败，请稍后重试。');
+      console.error(err);
+    }
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // 添加消息
+  function appendMessage(sender, text) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender === 'user' ? 'userMsg' : 'botMsg');
+    msgDiv.textContent = text;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // 删除聊天框最后一条bot消息（“正在生成回答...”）
+  function removeLastBotMessage() {
+    const botMessages = chatBox.querySelectorAll('.botMsg');
+    if (botMessages.length) {
+      const lastMsg = botMessages[botMessages.length - 1];
+      if (lastMsg.textContent.includes('正在生成回答')) {
+        lastMsg.remove();
+      }
+    }
+  }
+
+  // 绑定回车键发送
+  questionInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !sendBtn.disabled) {
+      sendQuestion();
+    }
+  });
+
+  sendBtn.addEventListener('click', sendQuestion);
+
+  // 页面加载后自动聚焦输入框
+  window.onload = () => {
+    questionInput.focus();
+  };
+  // 推荐问题点击填入输入框
+    document.querySelectorAll('.suggestion').forEach(item => {
+    item.addEventListener('click', () => {
+        questionInput.value = item.textContent;
+        sendBtn.disabled = false;
+        questionInput.focus();
+    });
+    });
+    document.getElementById('backBtn').addEventListener('click', () => {
+    window.history.back();
+    });
+
+</script>
+
+</body>
+</html>
