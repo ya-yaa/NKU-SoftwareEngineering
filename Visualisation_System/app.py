@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, render_template_string
+from flask import Flask, render_template, request, redirect, url_for, session, flash, render_template_stringP
+from fish_price_spider import get_today_fish_prices
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -7,6 +8,13 @@ import csv
 import os
 import base64
 from zhipuai import ZhipuAI
+import pandas as pd
+from flask import flash, redirect, url_for, request, session
+from pymysql import connect
+from mysql.connector import connect
+from flask import send_file
+from io import BytesIO
+import datetime
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
 
@@ -14,7 +22,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '123456',
+    'password': '040702',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -95,7 +103,7 @@ def login():
 
             conn.close()
 
-            flash("登录成功。")
+            flash("登录成功。", "login_success")
             return redirect(url_for('home'))
         else:
             flash("用户名或密码错误。")
@@ -225,6 +233,191 @@ def add_user():
 
     return render_template('add_user.html')
 
+from flask import flash, redirect, url_for
+
+@app.route('/admin/upload_fishes', methods=['GET', 'POST'])
+def upload_fishes():
+    if session.get('role') != 0:
+        flash("无权限", "error")  # 指定类别为 error
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        file = request.files['file']
+        if not file or file.filename == '':
+            flash("请选择要上传的文件。", "error")  # 指定类别为 error
+            return redirect(url_for('upload_fishes'))
+
+        try:
+            # 连接数据库
+            conn = connect(**db_config)
+            cursor = conn.cursor()
+
+            # 使用pandas读取Excel文件
+            if file.filename.endswith('.xls'):
+                df = pd.read_excel(file, engine='xlrd')
+            elif file.filename.endswith('.xlsx'):
+                df = pd.read_excel(file, engine='openpyxl')
+            elif file.filename.endswith('.csv'):
+                df = pd.read_csv(file)
+            else:
+                raise ValueError("Unsupported file format")
+
+            # 检查必要的列是否存在
+            required_columns = {'species', 'length1', 'length2', 'length3', 'height', 'date', 'weight', 'width'}
+            if not required_columns.issubset(df.columns):
+                raise ValueError("文件内容错误")
+
+            # 插入数据到数据库
+            for index, row in df.iterrows():
+                species = row.get('species')
+                length1 = row.get('length1')
+                length2 = row.get('length2')
+                length3 = row.get('length3')
+                height = row.get('height')
+                date = row.get('date')
+                weight = row.get('weight')
+                width = row.get('width')
+
+                # 检查是否有任何值为空
+                if any(pd.isna([species, length1, length2, length3, height, date, weight, width])):
+                    raise ValueError("文件内容错误")
+
+                cursor.execute(
+                    "INSERT INTO fishes (species, length1, length2, length3, height, date, weight, width) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (species, length1, length2, length3, height, date, weight, width)
+                )
+
+            conn.commit()
+            conn.close()
+            flash("数据上传成功！", "success")  # 指定类别为 success
+            return redirect(url_for('upload_fishes'))
+
+        except ValueError as ve:
+            # 特定错误信息，并指定类别为 error
+            flash(str(ve), "error")
+        except Exception as e:
+            # 其他错误信息，并指定类别为 error
+            flash(f"上传失败：{str(e)}", "error")
+
+        return redirect(url_for('upload_fishes'))
+
+    return render_template('upload_fishes.html')
+
+@app.route('/admin/export_fishes', methods=['GET'])
+def export_fishes():
+    if session.get('role') != 0:
+        flash("无权限", "error")
+        return redirect(url_for('home'))
+
+    # 获取用户请求的格式，默认是 csv
+    file_format = request.args.get('format', 'csv').lower()
+    if file_format not in ['csv', 'xls', 'xlsx']:
+        flash("不支持的文件格式", "error")
+        return redirect(url_for('upload_fishes')) 
+
+    try:
+        # 连接数据库
+        conn = connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+
+        # 查询所有鱼类数据
+        cursor.execute("SELECT fish_id, species, length1, length2, length3, height, date, weight, width FROM fishes")
+        data = cursor.fetchall()
+
+        conn.close()
+
+        # 将数据转为 pandas DataFrame
+        df = pd.DataFrame(data)
+
+        # 设置响应头以触发浏览器下载
+        output = BytesIO()
+
+        if file_format == 'csv':
+            df.to_csv(output, index=False, encoding='utf-8-sig')
+            content_type = 'text/csv'
+            filename = f"fishes_{datetime.now().strftime('%Y%m%d')}.csv"
+        # elif file_format == 'xls':
+        #     df.to_excel(output, index=False, engine='xlwt')
+        #     content_type = 'application/vnd.ms-excel'
+        #     filename = f"fishes_{datetime.now().strftime('%Y%m%d')}.xls"
+        elif file_format == 'xlsx':
+            df.to_excel(output, index=False, engine='openpyxl')
+            content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            filename = f"fishes_{datetime.now().strftime('%Y%m%d')}.xlsx"
+
+        # 构造响应
+        output.seek(0)
+        return send_file(
+            output,
+            mimetype=content_type,
+            as_attachment=True,
+            download_name=filename
+        )
+
+    except Exception as e:
+        print("导出失败，错误详情：", str(e))  # 关键调试信息
+        flash(f"导出失败: {str(e)}", "error")
+        return redirect(url_for('fish_farms'))
+    
+@app.route('/admin/export_fish_farms', methods=['GET'])
+def export_fish_farms():
+    if session.get('role') != 0:
+        flash("无权限", "error")
+        return redirect(url_for('home'))
+
+    # 获取用户请求的格式，默认是 csv
+    file_format = request.args.get('format', 'csv').lower()  # 修改为使用 GET 参数
+    if file_format not in ['csv', 'xlsx']:
+        flash("不支持的文件格式", "error")
+        return redirect(url_for('water_quality_data')) 
+
+    try:
+        # 连接数据库
+        conn = connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+
+        # 查询所有渔场的数据
+        query = """
+            SELECT id, province, river_basin, section_name, monitor_time, quality_level,
+                   water_temp, ph, dissolved_oxygen, conductivity, turbidity, cod_mn,
+                   ammonia_nitrogen, total_phosphorus, total_nitrogen, chlorophyll_a,
+                   algae_density, site_status, farm_id, source_date 
+            FROM water_quality_data
+        """
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+        conn.close()
+
+        # 将数据转为 pandas DataFrame
+        df = pd.DataFrame(data)
+
+        # 设置响应头以触发浏览器下载
+        output = BytesIO()
+
+        if file_format == 'csv':
+            df.to_csv(output, index=False, encoding='utf-8-sig')
+            content_type = 'text/csv'
+            filename = f"water_quality_data_{datetime.datetime.now().strftime('%Y%m%d')}.csv"
+        elif file_format == 'xlsx':
+            df.to_excel(output, index=False, engine='openpyxl')
+            content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            filename = f"water_quality_data_{datetime.datetime.now().strftime('%Y%m%d')}.xlsx"
+
+        # 构造响应
+        output.seek(0)
+        return send_file(
+            output,
+            mimetype=content_type,
+            as_attachment=True,
+            download_name=filename
+        )
+
+    except Exception as e:
+        print("导出失败，错误详情：", str(e))  # 关键调试信息
+        flash(f"导出失败: {str(e)}", "error")
+        return redirect(url_for('fish_farms'))
+
 # 渔场列表与搜索页面
 @app.route('/fish_farms', methods=['GET'])
 def fish_farms():
@@ -333,7 +526,31 @@ def csv_to_json_array(csv_file_path):
             json_array.append(processed_row)
         return json_array
 
-    
+def db_to_json_array():
+    # 连接数据库
+    conn = pymysql.connect(**db_config)
+    mycursor = conn.cursor()
+    # 执行SQL查询语句
+    query = "SELECT species, weight, length1, length2, length3, height, width FROM fishes"
+    mycursor.execute(query)
+    results = mycursor.fetchall()
+
+    json_array = []
+    for row in results:
+        processed_row = {
+            "Species": row[0],
+            "Weight(g)": row[1],
+            "Length1(cm)": row[2],
+            "Length2(cm)": row[3],
+            "Length3(cm)": row[4],
+            "Height(cm)": row[5],
+            "Width(cm)": row[6]
+        }
+        json_array.append(processed_row)
+
+    mycursor.close()
+    conn.close()
+    return json_array 
 
 @app.route('/fish_farm_detail/<int:farm_id>')
 def v_fish_farm(farm_id):
@@ -348,7 +565,7 @@ def v_fish_farm(farm_id):
     # 拼接得到 CSV 文件的完整路径
     csv_path = os.path.join(base_dir, "Fish.csv")
 
-    fish_data = csv_to_json_array(csv_path)
+    fish_data = db_to_json_array()
     # 修正后的 SQL 查询，添加 source_a 条件
     cursor.execute("SELECT * FROM water_quality_data WHERE farm_id = %s AND source_date = %s", (farm_id, '2020-05-08'))
     wat = cursor.fetchone()
@@ -428,7 +645,11 @@ def get_coordinates(province):
     }
     return province_coords.get(province, (0, 0))
 
-
+# 今日鱼群价格
+@app.route("/fish_price_today")
+def fish_price_today():
+    fish_data = get_today_fish_prices()
+    return render_template("fish_price_today.html", data=fish_data)
 
 # 数据中心（由警报改）
 from datetime import date
@@ -467,7 +688,6 @@ def datas():
     def check_exceed(key, value):
         try:
             value = float(value)
-            # 标准逻辑（简化处理）
             if key == 'water_temp':
                 return not (10 <= value <= 30)
             elif key == 'ph':
@@ -529,6 +749,75 @@ def datas():
 
     conn.close()
     return render_template('datas.html', data=data)
+
+from flask import jsonify
+@app.route('/alerts')
+def alerts():
+    if 'user_id' not in session or session.get('role') != 1:
+        return jsonify([])
+
+    user_id = session['user_id']
+    today = date.today()
+
+    conn = pymysql.connect(**db_config)
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("SELECT * FROM fish_farms WHERE farmer_id = %s", (user_id,))
+    farms = cursor.fetchall()
+
+    def check_exceed(key, value):
+        try:
+            value = float(value)
+            if key == 'water_temp':
+                return not (10 <= value <= 30)
+            elif key == 'ph':
+                return not (6.5 <= value <= 8.5)
+            elif key == 'dissolved_oxygen':
+                return value < 5
+            elif key == 'conductivity':
+                return value > 1500
+            elif key == 'turbidity':
+                return value > 5
+            elif key == 'cod_mn':
+                return value > 6
+            elif key == 'ammonia_nitrogen':
+                return value > 1.5
+            elif key == 'total_phosphorus':
+                return value > 0.2
+            elif key == 'total_nitrogen':
+                return value > 2.0
+            elif key == 'chlorophyll_a':
+                return value > 15
+            elif key == 'algae_density':
+                return value > 10000
+        except:
+            return False
+        return False
+
+    alerts = []
+    for farm in farms:
+        cursor.execute("""
+            SELECT * FROM water_quality_data 
+            WHERE farm_id = %s  
+            ORDER BY monitor_time DESC 
+            LIMIT 1
+        """, (farm['farm_id'],))
+        row = cursor.fetchone()
+        if row and row.get('site_status') == '正常':
+            for key, value in row.items():
+                if key in ['water_temp', 'ph', 'dissolved_oxygen', 'conductivity',
+                           'turbidity', 'cod_mn', 'ammonia_nitrogen',
+                           'total_phosphorus', 'total_nitrogen', 'chlorophyll_a', 'algae_density']:
+                    if check_exceed(key, value):
+                        alerts.append({
+                            'section_name': farm['section_name'],
+                            'param': key,
+                            'value': value
+                        })
+
+    conn.close()
+    return jsonify(alerts)
+
 
 # 智能中心
 @app.route('/AI_center')

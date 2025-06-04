@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传鱼类数据</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/title_image_withoutwords.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column; /* 垂直排列 */
+            justify-content: center; /* 上下分布 */
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: black;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background-color: white; /* 设置背景颜色为白色 */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加轻微阴影以增加层次感 */
+            text-align: center;
+            width: 100%;
+            max-width: 500px; /* 控制最大宽度 */
+            margin: 10px 0;
+        }
+
+        table {
+            margin: 0 auto; /* 让表格在容器内水平居中 */
+            border-collapse: collapse; /* 可选：使表格边框合并 */
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333; /* 标题颜色稍微深一点 */
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"],
+        button {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+            background-color: #f9f9f9; /* 输入框和按钮背景稍微浅一点 */
+            color: #333; /* 输入框内的文字颜色为深色 */
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Flash message 样式 */
+        .flashes {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .flashes li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            min-width: 200px;
+            color: #333; /* 确保消息文本颜色适合白色背景 */
+        }
+
+        /* 成功信息的样式 */
+        .success {
+            background-color: #d4edda; /* 绿色调背景 */
+            color: #155724; /* 深绿色文本 */
+            border: 2px solid green; /* 绿色边框 */
+        }
+
+        /* 错误信息的样式 */
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid red; /* 红色边框 */
+        }
+
+        .upload-format {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .upload-format img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>上传鱼类数据</h1>
+
+    <!-- 文件上传表单 -->
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload_fishes') }}">
+        <p>请上传 .xls .xlsx或.csv 格式的 Excel 文件</p>
+        <input type="file" name="file" accept=".xls,.xlsx, .csv">
+        <button type="submit">上传</button>
+    </form>
+
+    <!-- 显示 flash 消息 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+            {% if category != 'login_success' %}
+                <li class="{{ 'error' if category == 'error' else 'success' }}">{{ message }}</li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+</div>
+
+    <!-- 上传格式说明 -->
+    <div class="container">
+        <h2>上传格式说明</h2>
+        <p>请确保您的Excel文件包含以下列：</p>
+        <p>示例数据如下：</p>
+        <table border="1">
+            <tr>
+                <th>species</th>
+                <th>length1</th>
+                <th>length2</th>
+                <th>length3</th>
+                <th>height</th>
+                <th>date</th>
+                <th>weight</th>
+                <th>width</th>
+            </tr>
+            <tr>
+                <td>鲤鱼</td>
+                <td>23.2</td>
+                <td>25.4</td>
+                <td>30</td>
+                <td>11.52</td>
+                <td>1</td>
+                <td>242</td>
+                <td>4.02</td>
+            </tr>
+            <tr>
+                <td>鲤鱼</td>
+                <td>24</td>
+                <td>26.3</td>
+                <td>31.2</td>
+                <td>12.48</td>
+                <td>2</td>
+                <td>290</td>
+                <td>4.3056</td>
+            </tr>
+            <tr>
+                <td>鲤鱼</td>
+                <td>23.9</td>
+                <td>26.5</td>
+                <td>31.1</td>
+                <td>12.3778</td>
+                <td>3</td>
+                <td>340</td>
+                <td>4.6961</td>
+            </tr>
+            <tr>
+                <td>鲤鱼</td>
+                <td>26.3</td>
+                <td>29</td>
+                <td>33.5</td>
+                <td>12.73</td>
+                <td>4</td>
+                <td>363</td>
+                <td>4.4555</td>
+            </tr>
+            <tr>
+                <td>鲤鱼</td>
+                <td>26.5</td>
+                <td>29</td>
+                <td>34</td>
+                <td>12.444</td>
+                <td>5</td>
+                <td>430</td>
+                <td>5.134</td>
+            </tr>
+        </table>
+    </div>
+
+
+<script>
+    // 获取所有 flash 消息元素
+    const flashMessages = document.querySelectorAll('.flashes li');
+
+    // 如果存在 flash 消息，则设置定时器在2秒后隐藏它们
+    if (flashMessages.length > 0) {
+        setTimeout(() => {
+            flashMessages.forEach(msg => msg.style.display = 'none');
+        }, 2000);
+    }
+</script>
+
+</body>
+</html>
