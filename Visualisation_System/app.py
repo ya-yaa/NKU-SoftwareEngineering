@@ -954,11 +954,11 @@ def AI_center():
                         future_x = np.arange(len(lengths) + 1, len(lengths) + 1 + len(predictions))
 
                         plt.figure(figsize=(8, 4))
-                        plt.plot(x, y, 'bo-', label='历史体长')
-                        plt.plot(future_x, predictions, 'ro--', label='预测体长')
-                        plt.xlabel('日期序号')
-                        plt.ylabel('体长 (cm)')
-                        plt.title(f'{selected_species} 的体长预测')
+                        plt.plot(x, y, 'bo-', label='historical length')
+                        plt.plot(future_x, predictions, 'ro--', label='prdicted length')
+                        plt.xlabel('date')
+                        plt.ylabel('length (cm)')
+                        plt.title(f'{selected_species} predicted length')
                         plt.legend()
                         plt.tight_layout()
 
