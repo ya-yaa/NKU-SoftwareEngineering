@@ -837,13 +837,7 @@ def AI_center():
 
     # 1. 获取鱼类种类列表
     try:
-        connection = pymysql.connect(
-            host='localhost',
-            user='root',
-            password='123456',
-            database='visualsystem',
-            
-        )
+        connection = pymysql.connect(**db_config)
         cursor = connection.cursor()
         cursor.execute("SELECT DISTINCT species FROM fishes")
         species_list = [row[0] for row in cursor.fetchall()]
@@ -909,12 +903,7 @@ def AI_center():
                 error_msg = "请选择一个鱼类种类。"
             else:
                 try:
-                    connection = pymysql.connect(
-                        host='localhost',
-                        user='root',
-                        password='123456',
-                        database='visualsystem'
-                    )
+                    connection = pymysql.connect(**db_config)
                     cursor = connection.cursor()
                     cursor.execute(
                         "SELECT date, length2 FROM fishes WHERE species = %s ORDER BY date ASC",
@@ -958,7 +947,7 @@ def AI_center():
                         plt.plot(future_x, predictions, 'ro--', label='prdicted length')
                         plt.xlabel('date')
                         plt.ylabel('length (cm)')
-                        plt.title(f'{selected_species} predicted length')
+                        plt.title(f'predicted length')
                         plt.legend()
                         plt.tight_layout()
 
