@@ -24,7 +24,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '123456',
+    'password': 'yuxin173',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -840,7 +840,7 @@ def AI_center():
         connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='123456',
+            password='yuxin173',
             database='visualsystem',
             
         )

@@ -273,6 +273,7 @@
         
         // 使用 html2canvas 生成图片
         html2canvas(targetElement, {
+          scale: 2,
           useCORS: true,
           logging: false,
           backgroundColor: '#023776', // 设置背景色为白色
@@ -336,13 +337,13 @@
             color: '#fff'  // 这里设置为白色，你可以改为任意想要的颜色，如十六进制颜色值、RGB 颜色值等
         },
                 data: [
-                        { name: 'Bream' ,itemStyle: { color: '#A8E6CE' }},
-                        { name: 'Roach' ,itemStyle: { color: '#CFFAFE' }},
-                        { name: 'Whitefish' ,itemStyle: { color: '#95A8C5' }},
-                        { name: 'Parkki' ,itemStyle: { color: '#FAFAD2' }},
-                        { name: 'Perch' ,itemStyle: { color: '#EBEEBF' }},
-                        { name: 'Pike' ,itemStyle: { color: '#95A3C6' }},
-                        { name: 'Smelt' ,itemStyle: { color: '#5470C6' }}
+                        { name: '鲤鱼' ,itemStyle: { color: '#A8E6CE' }},
+                        { name: '草鱼' ,itemStyle: { color: '#CFFAFE' }},
+                        { name: '鲫鱼' ,itemStyle: { color: '#95A8C5' }},
+                        { name: '胖头鱼' ,itemStyle: { color: '#FAFAD2' }},
+                        { name: '鲢鱼' ,itemStyle: { color: '#EBEEBF' }},
+                        { name: '鲶鱼' ,itemStyle: { color: '#95A3C6' }},
+                        
                     ]
             },
             series: [
@@ -367,13 +368,13 @@
                         show: false
                     },
                     data: [
-                        { value: 22.0, name: 'Bream' ,itemStyle: { color: '#A8E6CE' }},
-                        { value: 12.6, name: 'Roach' ,itemStyle: { color: '#CFFAFE' }},
-                        { value: 3.8, name: 'Whitefish' ,itemStyle: { color: '#95A8C5' }},
-                        { value: 6.9, name: 'Parkki' ,itemStyle: { color: '#FAFAD2' }},
-                        { value: 35.2, name: 'Perch' ,itemStyle: { color: '#EBEEBF' }},
-                        { value: 10.7, name: 'Pike' ,itemStyle: { color: '#95A3C6' }},
-                        { value: 8.2, name: 'Smelt' ,itemStyle: { color: '#5470C6' }}
+                        { value: 22.0, name: '鲤鱼' ,itemStyle: { color: '#A8E6CE' }},
+                        { value: 12.6, name: '草鱼' ,itemStyle: { color: '#CFFAFE' }},
+                        { value: 3.8, name: '鲫鱼' ,itemStyle: { color: '#95A8C5' }},
+                        { value: 6.9, name: '胖头鱼' ,itemStyle: { color: '#FAFAD2' }},
+                        { value: 35.2, name: '鲢鱼' ,itemStyle: { color: '#EBEEBF' }},
+                        { value: 10.7, name: '鲶鱼' ,itemStyle: { color: '#95A3C6' }},
+                       
                     ]
                 }
             ]
@@ -433,13 +434,13 @@
     <button id="downloadBtn3" class="Btn3"><i class="fa fa-download mr-2"></i>点击下载</button>
     <div class="selection-container">
     <select id="fishSpecies">
-        <option value="Bream">Bream</option>
-        <option value="Roach">Roach</option>
-        <option value="Whitefish">Whitefish</option>
-        <option value="Parkki">Parkki</option>
-        <option value="Perch">Perch</option>
-        <option value="Pike">Pike</option>
-        <option value="Smelt">Smelt</option>
+        <option value="鲤鱼">鲤鱼</option>
+        <option value="草鱼">草鱼</option>
+        <option value="鲫鱼">鲫鱼</option>
+        <option value="胖头鱼">胖头鱼</option>
+        <option value="鲢鱼">鲢鱼</option>
+        <option value="鲶鱼">鲶鱼</option>
+        
     </select>
 
     <label for="viewObject">选择查看信息种类：</label>
