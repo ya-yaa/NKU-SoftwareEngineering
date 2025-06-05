@@ -24,7 +24,7 @@ app.secret_key = 'my_secret_key'  # 用于 session 加密
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '123456',
+    'password': 'yuxin173',
     'database': 'visualsystem',
     'charset': 'utf8mb4'
 }
@@ -838,6 +838,7 @@ def AI_center():
     # 1. 获取鱼类种类列表
     try:
         connection = pymysql.connect(**db_config)
+        
         cursor = connection.cursor()
         cursor.execute("SELECT DISTINCT species FROM fishes")
         species_list = [row[0] for row in cursor.fetchall()]
