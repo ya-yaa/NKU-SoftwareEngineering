@@ -837,13 +837,7 @@ def AI_center():
 
     # 1. 获取鱼类种类列表
     try:
-        connection = pymysql.connect(
-            host='localhost',
-            user='root',
-            password='123456',
-            database='visualsystem',
-            
-        )
+        connection = pymysql.connect(**db_config)
         cursor = connection.cursor()
         cursor.execute("SELECT DISTINCT species FROM fishes")
         species_list = [row[0] for row in cursor.fetchall()]
@@ -909,12 +903,7 @@ def AI_center():
                 error_msg = "请选择一个鱼类种类。"
             else:
                 try:
-                    connection = pymysql.connect(
-                        host='localhost',
-                        user='root',
-                        password='123456',
-                        database='visualsystem'
-                    )
+                    connection = pymysql.connect(**db_config)
                     cursor = connection.cursor()
                     cursor.execute(
                         "SELECT date, length2 FROM fishes WHERE species = %s ORDER BY date ASC",
@@ -953,17 +942,16 @@ def AI_center():
                         y = np.array(lengths)
                         future_x = np.arange(len(lengths) + 1, len(lengths) + 1 + len(predictions))
 
-                        plt.figure(figsize=(8, 4))
-                        plt.plot(x, y, 'bo-', label='历史体长')
-                        plt.plot(future_x, predictions, 'ro--', label='预测体长')
-                        plt.xlabel('日期序号')
-                        plt.ylabel('体长 (cm)')
-                        plt.title(f'{selected_species} 的体长预测')
+                        plt.figure(figsize=(8, 4), constrained_layout=True)  # 开启自动布局
+                        plt.plot(x, y, 'bo-', label='historical length')
+                        plt.plot(future_x, predictions, 'ro--', label='predicted length')
+                        plt.xlabel('date')
+                        plt.ylabel('length (cm)')
+                        plt.title('predicted length', pad=5)  # 控制标题与图像之间的间距
                         plt.legend()
-                        plt.tight_layout()
 
                         img_io = BytesIO()
-                        plt.savefig(img_io, format='png')
+                        plt.savefig(img_io, format='png', bbox_inches='tight')  # ✅ 去除上方空白
                         img_io.seek(0)
                         encoded_plot = base64.b64encode(img_io.read()).decode('utf-8')
                         plt.close()
