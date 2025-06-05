@@ -2,8 +2,8 @@
 22级 南开大学软件工程课程大作业 智慧海洋牧场可视化系统
 
 ## 🏗️ 项目结构
-NKU-SoftwareEngineering/
-.
+```
+    NKU-SoftwareEngineering/
     ├── README.md
     ├── Visualisation_System
     │   ├── .gitignore
@@ -55,7 +55,13 @@ NKU-SoftwareEngineering/
         └── water_data_clean
             ├── 2020-05
             │....
+```
+### 📁 主要目录说明
 
+-   **`data_clean/`** - 清理数据脚本
+-   **`test/`** - 项目test脚本
+-   **`Visualisation_System/`** - 可视化文件
+-   **`水质数据（已清理）/`** - 清理后水质数据
 ## 🔧安装依赖
 
 ```bash
@@ -68,5 +74,7 @@ pip install flask matplotlib requests pymysql werkzeug pandas numpy zhipuai mysq
 
 ```
 
-## 🚀运行实例
+## 🚀运行示例
+```bash
 python app.py
+```
