@@ -942,17 +942,16 @@ def AI_center():
                         y = np.array(lengths)
                         future_x = np.arange(len(lengths) + 1, len(lengths) + 1 + len(predictions))
 
-                        plt.figure(figsize=(8, 4))
+                        plt.figure(figsize=(8, 4), constrained_layout=True)  # 开启自动布局
                         plt.plot(x, y, 'bo-', label='historical length')
-                        plt.plot(future_x, predictions, 'ro--', label='prdicted length')
+                        plt.plot(future_x, predictions, 'ro--', label='predicted length')
                         plt.xlabel('date')
                         plt.ylabel('length (cm)')
-                        plt.title(f'predicted length')
+                        plt.title('predicted length', pad=5)  # 控制标题与图像之间的间距
                         plt.legend()
-                        plt.tight_layout()
 
                         img_io = BytesIO()
-                        plt.savefig(img_io, format='png')
+                        plt.savefig(img_io, format='png', bbox_inches='tight')  # ✅ 去除上方空白
                         img_io.seek(0)
                         encoded_plot = base64.b64encode(img_io.read()).decode('utf-8')
                         plt.close()
