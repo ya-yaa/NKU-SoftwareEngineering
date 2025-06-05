@@ -12,6 +12,16 @@
 <head>
     <meta charset="UTF-8">
     <title>渔场水质监测</title>
+     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+   
+    <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入 Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入 html2canvas 库 -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,8 +31,9 @@
             align-items: center;
         }
         h1 {
-            color: #333;
+            color: #fffefe;
             margin-bottom: 20px;
+            font-size: 40px !important; 
         }
         .container {
             width: 80%;
@@ -121,16 +132,7 @@
         }
     </style>
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
-     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-   
-    <!-- 引入 Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 引入 Font Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <!-- 引入 html2canvas 库 -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
   <script>
     tailwind.config = {
       theme: {
@@ -164,9 +166,9 @@
 </head>
 <body>
     
-    <header>
+    <!-- <header> -->
         <h1>渔场水质监测数据</h1>
-    </header>   
+    <!-- </header>    -->
     
     <div class="container" > 
         {% if data %}
