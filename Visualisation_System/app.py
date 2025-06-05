@@ -16,7 +16,6 @@ from pymysql import connect
 from mysql.connector import connect
 from flask import send_file
 from io import BytesIO
-from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'  # 用于 session 加密
@@ -401,11 +400,11 @@ def export_fish_farms():
         if file_format == 'csv':
             df.to_csv(output, index=False, encoding='utf-8-sig')
             content_type = 'text/csv'
-            filename = f"water_quality_data_{datetime.datetime.now().strftime('%Y%m%d')}.csv"
+            filename = f"water_quality_data_{datetime.now().strftime('%Y%m%d')}.csv"
         elif file_format == 'xlsx':
             df.to_excel(output, index=False, engine='openpyxl')
             content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            filename = f"water_quality_data_{datetime.datetime.now().strftime('%Y%m%d')}.xlsx"
+            filename = f"water_quality_data_{datetime.now().strftime('%Y%m%d')}.xlsx"
 
         # 构造响应
         output.seek(0)
